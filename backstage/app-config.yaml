@@ -1,0 +1,107 @@
+app:
+  title: Developer Control Plane
+  baseUrl: ${APP_BASE_URL}
+
+organization:
+  name: Internal Developer Platform
+
+backend:
+  baseUrl: ${BACKEND_BASE_URL}
+  listen:
+    port: 7007
+  csp:
+    connect-src: ["'self'", "http:", "https:"]
+  cors:
+    origin: ${APP_BASE_URL}
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
+  database:
+    client: pg
+    connection:
+      host: ${POSTGRES_HOST}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      database: ${POSTGRES_DB}
+
+# Local authentication configuration
+auth:
+  providers:
+    guest:
+      dangerouslyAllowOutsideDevelopment: true
+
+integrations:
+  # Integration with Score service
+  score:
+    host: http://score-service:8081
+  # Integration with Eclipse Che
+  che:
+    host: http://che:8080
+
+catalog:
+  import:
+    entityFilename: catalog-info.yaml
+    pullRequestBranchName: backstage-integration
+  rules:
+    - allow: [Component, System, API, Resource, Location, Template, User, Group]
+  locations:
+    # Local catalog entities
+    - type: file
+      target: /app/catalog/all.yaml
+      rules:
+        - allow:
+            [Component, System, API, Resource, Location, Template, User, Group]
+    # Score workload templates
+    - type: file
+      target: /app/catalog/templates/score-workload.yaml
+      rules:
+        - allow: [Template]
+
+# Plugin extension points
+plugins:
+  # Score integration plugin
+  score:
+    enabled: true
+    apiEndpoint: http://score-service:8081
+    webhookEndpoint: http://score-service:8082
+  # Che integration plugin
+  che:
+    enabled: true
+    endpoint: http://che:8080
+  # Custom plugin loader
+  custom:
+    pluginDir: /app/plugins
+    autoload: true
+
+# Proxy configuration for external services
+proxy:
+  "/score-api":
+    target: "http://score-service:8081"
+    changeOrigin: true
+    pathRewrite:
+      "^/score-api": "/"
+  "/che-api":
+    target: "http://che:8080"
+    changeOrigin: true
+    pathRewrite:
+      "^/che-api": "/"
+  "/plugin-manager":
+    target: "http://plugin-manager:8083"
+    changeOrigin: true
+    pathRewrite:
+      "^/plugin-manager": "/"
+
+# Kubernetes promotion path configuration
+kubernetes:
+  # These settings support promotion to K8s
+  serviceLocatorMethod:
+    type: "multiTenant"
+  clusterLocatorMethods:
+    - type: "config"
+      clusters: []
+
+# Scaffolder templates for workload deployment
+scaffolder:
+  defaultAuthor:
+    name: Developer Control Plane
+    email: platform@example.com

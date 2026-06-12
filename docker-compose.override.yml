@@ -1,0 +1,27 @@
+# Docker Compose override for development
+# This file is automatically used when running docker-compose
+# To use production settings, use: docker-compose -f docker-compose.yml
+
+services:
+  score-service:
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+    volumes:
+      # Mount source for hot reload (if using nodemon)
+      - ./score-service:/app:ro
+      - /app/node_modules
+
+  plugin-manager:
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+    volumes:
+      # Mount source for hot reload
+      - ./plugin-manager:/app:ro
+      - /app/node_modules
+
+  gateway:
+    volumes:
+      # Hot reload nginx config
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro

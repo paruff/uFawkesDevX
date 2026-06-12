@@ -1,0 +1,59 @@
+# Score Service Configuration
+
+# API Settings
+api:
+  port: 8081
+  basePath: /api/v1
+
+# Webhook Settings
+webhook:
+  port: 8082
+  basePath: /webhooks
+
+# Database
+database:
+  url: ${DATABASE_URL}
+  pool:
+    min: 2
+    max: 10
+
+# Pipeline Triggers
+pipeline:
+  enabled: ${PIPELINE_TRIGGER_ENABLED}
+  defaultTimeout: 300
+  retryAttempts: 3
+
+# Plugin Configuration
+plugins:
+  directory: /app/plugins
+  autoload: true
+  # Extension points for custom plugins
+  extensionPoints:
+    - name: spec-validation
+      description: Validate Score specifications
+      interface: "validateSpec(spec) => { valid: boolean, errors: [] }"
+    - name: pipeline-trigger
+      description: Handle pipeline trigger events
+      interface: "onPipelineTrigger(workload, action, metadata) => void"
+    - name: webhook-handler
+      description: Handle incoming webhooks
+      interface: "onWebhook(integration, event, payload) => void"
+
+# Score Specification Validation
+validation:
+  strict: true
+  allowedApiVersions:
+    - score.dev/v1b1
+  maxContainers: 10
+  maxResourcesPerContainer: 5
+
+# Integration Settings
+integrations:
+  backstage:
+    enabled: true
+    webhookUrl: http://backstage:7007/api/webhooks/score
+  kubernetes:
+    enabled: false
+    # K8s promotion path configuration
+    namespace: default
+    ingressClass: nginx
