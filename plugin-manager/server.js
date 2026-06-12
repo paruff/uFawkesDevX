@@ -51,16 +51,16 @@ const validatePlugin = ajv.compile(pluginSchema);
 async function loadPlugins() {
   try {
     const entries = await fs.readdir(PLUGIN_DIR, { withFileTypes: true });
-    
+
     for (const entry of entries) {
       if (entry.isDirectory()) {
         const pluginPath = path.join(PLUGIN_DIR, entry.name);
         const manifestPath = path.join(pluginPath, 'plugin.json');
-        
+
         try {
           const manifestData = await fs.readFile(manifestPath, 'utf8');
           const manifest = JSON.parse(manifestData);
-          
+
           if (validatePlugin(manifest)) {
             plugins.set(manifest.name, {
               ...manifest,
@@ -105,11 +105,11 @@ app.get('/api/v1/plugins', (req, res) => {
 app.get('/api/v1/plugins/:name', (req, res) => {
   const { name } = req.params;
   const plugin = plugins.get(name);
-  
+
   if (!plugin) {
     return res.status(404).json({ error: 'Plugin not found' });
   }
-  
+
   res.json(plugin);
 });
 
@@ -117,24 +117,24 @@ app.get('/api/v1/plugins/:name', (req, res) => {
 app.post('/api/v1/plugins', async (req, res) => {
   try {
     const { name, source, type } = req.body;
-    
+
     if (!name || !source) {
       return res.status(400).json({ error: 'name and source are required' });
     }
-    
+
     // Check if plugin already exists
     if (plugins.has(name)) {
       return res.status(409).json({ error: 'Plugin already installed' });
     }
-    
+
     const pluginPath = path.join(PLUGIN_DIR, name);
-    
+
     // Create plugin directory
     await fs.mkdir(pluginPath, { recursive: true });
-    
+
     // Download or copy plugin (simplified - in production would handle various sources)
     console.log(`Installing plugin ${name} from ${source}`);
-    
+
     // Create a basic plugin manifest
     const manifest = {
       name,
@@ -144,14 +144,14 @@ app.post('/api/v1/plugins', async (req, res) => {
       extensionPoints: [],
       installedAt: new Date().toISOString(),
     };
-    
+
     await fs.writeFile(
       path.join(pluginPath, 'plugin.json'),
       JSON.stringify(manifest, null, 2)
     );
-    
+
     plugins.set(name, { ...manifest, path: pluginPath, enabled: true });
-    
+
     res.status(201).json({ message: 'Plugin installed', plugin: manifest });
   } catch (error) {
     console.error('Error installing plugin:', error);
@@ -164,27 +164,27 @@ app.put('/api/v1/plugins/:name', async (req, res) => {
   try {
     const { name } = req.params;
     const { enabled, config } = req.body;
-    
+
     const plugin = plugins.get(name);
     if (!plugin) {
       return res.status(404).json({ error: 'Plugin not found' });
     }
-    
+
     // Update plugin settings
     if (typeof enabled === 'boolean') {
       plugin.enabled = enabled;
     }
-    
+
     if (config) {
       plugin.config = { ...plugin.config, ...config };
     }
-    
+
     // Save updated manifest
     const manifestPath = path.join(plugin.path, 'plugin.json');
     await fs.writeFile(manifestPath, JSON.stringify(plugin, null, 2));
-    
+
     plugins.set(name, plugin);
-    
+
     res.json({ message: 'Plugin updated', plugin });
   } catch (error) {
     console.error('Error updating plugin:', error);
@@ -196,24 +196,24 @@ app.put('/api/v1/plugins/:name', async (req, res) => {
 app.delete('/api/v1/plugins/:name', async (req, res) => {
   try {
     const { name } = req.params;
-    
+
     const plugin = plugins.get(name);
     if (!plugin) {
       return res.status(404).json({ error: 'Plugin not found' });
     }
-    
+
     // Validate that plugin.path is within PLUGIN_DIR to prevent directory traversal
     const resolvedPath = path.resolve(plugin.path);
     const resolvedPluginDir = path.resolve(PLUGIN_DIR);
     if (!resolvedPath.startsWith(resolvedPluginDir)) {
       return res.status(400).json({ error: 'Invalid plugin path' });
     }
-    
+
     // Remove plugin directory
     await fs.rm(plugin.path, { recursive: true, force: true });
-    
+
     plugins.delete(name);
-    
+
     res.json({ message: 'Plugin uninstalled', name });
   } catch (error) {
     console.error('Error uninstalling plugin:', error);
@@ -273,14 +273,14 @@ app.get('/api/v1/extension-points', (req, res) => {
       },
     ],
   };
-  
+
   res.json({ extensionPoints });
 });
 
 // Get plugins by extension point
 app.get('/api/v1/extension-points/:type/:point', (req, res) => {
   const { type, point } = req.params;
-  
+
   const matchingPlugins = Array.from(plugins.values())
     .filter(p => p.type === type && p.extensionPoints?.includes(point))
     .map(p => ({
@@ -289,7 +289,7 @@ app.get('/api/v1/extension-points/:type/:point', (req, res) => {
       description: p.description,
       enabled: p.enabled,
     }));
-  
+
   res.json({ extensionPoint: `${type}:${point}`, plugins: matchingPlugins });
 });
 
@@ -297,7 +297,7 @@ app.get('/api/v1/extension-points/:type/:point', (req, res) => {
 async function start() {
   try {
     await loadPlugins();
-    
+
     app.listen(API_PORT, () => {
       console.log(`Plugin Manager listening on port ${API_PORT}`);
       console.log(`Loaded ${plugins.size} plugins`);

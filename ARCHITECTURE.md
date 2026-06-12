@@ -42,9 +42,11 @@ External Access Points:
 ## Component Responsibilities
 
 ### API Gateway (NGINX)
+
 **Purpose**: Unified entry point for all services
 
 **Routes**:
+
 - `/` → API documentation (HTML)
 - `/backstage/*` → Backstage Portal
 - `/api/score/*` → Score REST API
@@ -53,15 +55,18 @@ External Access Points:
 - `/che/*` → Eclipse Che
 
 **Features**:
+
 - CORS handling
 - Request routing
 - Health check endpoint
 - Static documentation serving
 
 ### Backstage Portal
+
 **Purpose**: Developer portal and service catalog
 
 **Features**:
+
 - Service catalog
 - Software templates (scaffolder)
 - Tech docs
@@ -69,6 +74,7 @@ External Access Points:
 - Local guest authentication
 
 **Catalog Entities**:
+
 - Components: score-service, eclipse-che, plugin-manager
 - Systems: developer-control-plane
 - APIs: score-api, score-webhooks, che-api, plugin-api
@@ -77,10 +83,13 @@ External Access Points:
 **Port**: 7007
 
 ### Score Service
+
 **Purpose**: Workload specification management
 
 **APIs**:
+
 - **REST API (Port 8081)**:
+
   - `GET /api/v1/specs` - List specifications
   - `POST /api/v1/specs` - Create/update specification
   - `GET /api/v1/specs/:name` - Get specification
@@ -94,6 +103,7 @@ External Access Points:
   - `POST /webhooks/:integration/:event` - Generic webhooks
 
 **Features**:
+
 - Score specification validation (JSON Schema)
 - Plugin system for extensibility
 - Pipeline trigger management
@@ -101,14 +111,17 @@ External Access Points:
 - File-based spec storage
 
 **Extension Points**:
+
 - `spec-validator` - Custom validation logic
 - `pipeline-trigger` - Custom pipeline handlers
 - `webhook-handler` - Custom webhook processing
 
 ### Eclipse Che
+
 **Purpose**: Cloud development environments
 
 **Features**:
+
 - Web-based IDE
 - Workspace management
 - Container-based development
@@ -118,9 +131,11 @@ External Access Points:
 **Port**: 8080
 
 ### Plugin Manager
+
 **Purpose**: Platform extension management
 
 **APIs**:
+
 - `GET /api/v1/plugins` - List installed plugins
 - `POST /api/v1/plugins` - Install plugin
 - `PUT /api/v1/plugins/:name` - Update plugin
@@ -129,6 +144,7 @@ External Access Points:
 - `GET /api/v1/extension-points/:type/:point` - Get plugins by extension point
 
 **Plugin Types**:
+
 - `backstage` - Backstage portal plugins
 - `score` - Score service plugins
 - `che` - Eclipse Che plugins
@@ -137,13 +153,16 @@ External Access Points:
 **Port**: 8083
 
 ### PostgreSQL
+
 **Purpose**: Data persistence
 
 **Databases**:
+
 - `backstage` - Backstage catalog and configuration
 - `score` - Score specifications and pipeline runs
 
 **Tables** (Score DB):
+
 - `score_specs` - Workload specifications
 - `pipeline_runs` - Pipeline execution history
 
@@ -188,7 +207,9 @@ External System → Gateway → Score Webhooks → Plugin Handlers
 ### Score Service Extensions
 
 #### 1. Spec Validator
+
 **Interface**:
+
 ```javascript
 async validateSpec(spec) {
   return {
@@ -199,13 +220,16 @@ async validateSpec(spec) {
 ```
 
 **Use Cases**:
+
 - Organization-specific validation rules
 - Security policy enforcement
 - Resource limit validation
 - Naming convention enforcement
 
 #### 2. Pipeline Trigger
+
 **Interface**:
+
 ```javascript
 async onPipelineTrigger(workload, action, metadata) {
   // Custom logic
@@ -213,13 +237,16 @@ async onPipelineTrigger(workload, action, metadata) {
 ```
 
 **Use Cases**:
+
 - Notify external systems (Slack, JIRA)
 - Update deployment tracking
 - Execute pre/post-deployment hooks
 - Integrate with CI/CD systems
 
 #### 3. Webhook Handler
+
 **Interface**:
+
 ```javascript
 async onWebhook(integration, event, payload) {
   // Custom logic
@@ -227,6 +254,7 @@ async onWebhook(integration, event, payload) {
 ```
 
 **Use Cases**:
+
 - Process GitHub webhooks
 - Handle JIRA events
 - Integrate monitoring alerts
@@ -235,13 +263,17 @@ async onWebhook(integration, event, payload) {
 ### Backstage Extensions
 
 #### 1. Catalog Entity Provider
+
 **Use Cases**:
+
 - Import services from external systems
 - Sync with service registries
 - Dynamic catalog updates
 
 #### 2. Scaffolder Action
+
 **Use Cases**:
+
 - Custom deployment actions
 - Infrastructure provisioning
 - Service registration
@@ -249,13 +281,17 @@ async onWebhook(integration, event, payload) {
 ### Platform Extensions
 
 #### 1. Auth Provider
+
 **Use Cases**:
+
 - Custom authentication
 - SSO integration
 - Token management
 
 #### 2. Metrics Collector
+
 **Use Cases**:
+
 - Custom metrics
 - Usage tracking
 - Performance monitoring
@@ -263,6 +299,7 @@ async onWebhook(integration, event, payload) {
 ## Network Architecture
 
 ### Docker Network
+
 ```
 Name: developerd-control-plane
 Type: bridge
@@ -277,7 +314,9 @@ Services on network:
 ```
 
 ### Service Discovery
+
 Services use DNS names on the Docker network:
+
 - `postgres:5432`
 - `backstage:7007`
 - `score-service:8081` / `score-service:8082`
@@ -288,15 +327,15 @@ Services use DNS names on the Docker network:
 
 ### Volumes
 
-| Volume | Purpose | Size Consideration |
-|--------|---------|-------------------|
-| `postgres-data` | Database files | Growing with data |
-| `backstage-plugins` | Backstage plugins | Fixed |
-| `che-data` | Che configuration | Small, fixed |
-| `che-workspaces` | Development workspaces | Large, growing |
-| `score-specs` | Score spec files | Growing slowly |
-| `score-plugins` | Score plugins | Small, fixed |
-| `plugin-registry` | Platform plugins | Small, fixed |
+| Volume              | Purpose                | Size Consideration |
+| ------------------- | ---------------------- | ------------------ |
+| `postgres-data`     | Database files         | Growing with data  |
+| `backstage-plugins` | Backstage plugins      | Fixed              |
+| `che-data`          | Che configuration      | Small, fixed       |
+| `che-workspaces`    | Development workspaces | Large, growing     |
+| `score-specs`       | Score spec files       | Growing slowly     |
+| `score-plugins`     | Score plugins          | Small, fixed       |
+| `plugin-registry`   | Platform plugins       | Small, fixed       |
 
 ### File System Layout
 
@@ -339,20 +378,26 @@ Services use DNS names on the Docker network:
 The architecture is designed for easy Kubernetes promotion:
 
 ### Service → Deployment
+
 Each service becomes a Kubernetes Deployment with:
+
 - ReplicaSet for scaling
 - ConfigMaps for configuration
 - Secrets for credentials
 - PersistentVolumeClaims for storage
 
 ### Gateway → Ingress
+
 NGINX Gateway becomes Kubernetes Ingress with:
+
 - Ingress rules for routing
 - TLS termination
 - Path-based routing
 
 ### Network → Service Mesh
+
 Docker network becomes:
+
 - Kubernetes Services for discovery
 - Service mesh (Istio/Linkerd) for mTLS
 - Network policies for isolation
@@ -362,7 +407,9 @@ See [KUBERNETES.md](KUBERNETES.md) for detailed migration guide.
 ## Scalability Considerations
 
 ### Horizontal Scaling
+
 Services that can be scaled horizontally:
+
 - ✅ Backstage (stateless)
 - ✅ Score Service (stateless, shared DB)
 - ⚠️ Eclipse Che (requires orchestration)
@@ -370,6 +417,7 @@ Services that can be scaled horizontally:
 - ❌ PostgreSQL (requires replication setup)
 
 ### Performance Bottlenecks
+
 - Database: Use connection pooling, read replicas
 - Score Service: Scale to multiple instances
 - Gateway: Use CDN for static content
@@ -377,14 +425,14 @@ Services that can be scaled horizontally:
 
 ### Resource Requirements
 
-| Service | CPU (min) | Memory (min) | Storage |
-|---------|-----------|--------------|---------|
-| Backstage | 0.5 core | 512 MB | None |
-| Score Service | 0.25 core | 256 MB | Minimal |
-| Eclipse Che | 1 core | 1 GB | Workspace-dependent |
-| Plugin Manager | 0.1 core | 128 MB | Minimal |
-| PostgreSQL | 0.5 core | 512 MB | 10+ GB |
-| Gateway | 0.1 core | 64 MB | None |
+| Service        | CPU (min) | Memory (min) | Storage             |
+| -------------- | --------- | ------------ | ------------------- |
+| Backstage      | 0.5 core  | 512 MB       | None                |
+| Score Service  | 0.25 core | 256 MB       | Minimal             |
+| Eclipse Che    | 1 core    | 1 GB         | Workspace-dependent |
+| Plugin Manager | 0.1 core  | 128 MB       | Minimal             |
+| PostgreSQL     | 0.5 core  | 512 MB       | 10+ GB              |
+| Gateway        | 0.1 core  | 64 MB        | None                |
 
 **Total Minimum**: 2.5 cores, 2.5 GB RAM, 10 GB storage
 **Recommended**: 4+ cores, 4+ GB RAM, 50+ GB storage

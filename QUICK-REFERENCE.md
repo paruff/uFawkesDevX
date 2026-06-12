@@ -60,11 +60,13 @@ curl http://localhost:8083/health
 ## Score Operations
 
 ### List Workloads
+
 ```bash
 curl http://localhost:8081/api/v1/specs | jq
 ```
 
 ### Create Workload
+
 ```bash
 curl -X POST http://localhost:8081/api/v1/specs \
   -H "Content-Type: application/json" \
@@ -78,16 +80,19 @@ curl -X POST http://localhost:8081/api/v1/specs \
 ```
 
 ### Get Workload
+
 ```bash
 curl http://localhost:8081/api/v1/specs/my-app | jq
 ```
 
 ### Delete Workload
+
 ```bash
 curl -X DELETE http://localhost:8081/api/v1/specs/my-app
 ```
 
 ### Trigger Pipeline
+
 ```bash
 curl -X POST http://localhost:8082/webhooks/pipeline/trigger \
   -H "Content-Type: application/json" \
@@ -95,6 +100,7 @@ curl -X POST http://localhost:8082/webhooks/pipeline/trigger \
 ```
 
 ### List Pipelines
+
 ```bash
 curl http://localhost:8081/api/v1/pipelines | jq
 ```
@@ -102,16 +108,19 @@ curl http://localhost:8081/api/v1/pipelines | jq
 ## Plugin Operations
 
 ### List Plugins
+
 ```bash
 curl http://localhost:8083/api/v1/plugins | jq
 ```
 
 ### List Extension Points
+
 ```bash
 curl http://localhost:8083/api/v1/extension-points | jq
 ```
 
 ### Install Plugin
+
 ```bash
 curl -X POST http://localhost:8083/api/v1/plugins \
   -H "Content-Type: application/json" \
@@ -123,6 +132,7 @@ curl -X POST http://localhost:8083/api/v1/plugins \
 ```
 
 ### Update Plugin
+
 ```bash
 curl -X PUT http://localhost:8083/api/v1/plugins/my-plugin \
   -H "Content-Type: application/json" \
@@ -130,6 +140,7 @@ curl -X PUT http://localhost:8083/api/v1/plugins/my-plugin \
 ```
 
 ### Delete Plugin
+
 ```bash
 curl -X DELETE http://localhost:8083/api/v1/plugins/my-plugin
 ```
@@ -137,42 +148,45 @@ curl -X DELETE http://localhost:8083/api/v1/plugins/my-plugin
 ## Database Operations
 
 ### Connect to PostgreSQL
+
 ```bash
 docker compose exec postgres psql -U backstage -d backstage
 ```
 
 ### Backup Database
+
 ```bash
 docker compose exec postgres pg_dump -U backstage backstage > backup.sql
 docker compose exec postgres pg_dump -U backstage score > backup-score.sql
 ```
 
 ### Restore Database
+
 ```bash
 cat backup.sql | docker compose exec -T postgres psql -U backstage backstage
 ```
 
 ## Access Points
 
-| Service | URL | Purpose |
-|---------|-----|---------|
-| API Gateway | http://localhost:8000 | Unified API entry point |
-| Backstage | http://localhost:7007 | Developer portal |
-| Eclipse Che | http://localhost:8080 | Cloud dev environments |
-| Score API | http://localhost:8081 | Direct Score API access |
-| Score Webhooks | http://localhost:8082 | Webhook endpoints |
-| Plugin Manager | http://localhost:8083 | Plugin management |
+| Service        | URL                   | Purpose                 |
+| -------------- | --------------------- | ----------------------- |
+| API Gateway    | http://localhost:8000 | Unified API entry point |
+| Backstage      | http://localhost:7007 | Developer portal        |
+| Eclipse Che    | http://localhost:8080 | Cloud dev environments  |
+| Score API      | http://localhost:8081 | Direct Score API access |
+| Score Webhooks | http://localhost:8082 | Webhook endpoints       |
+| Plugin Manager | http://localhost:8083 | Plugin management       |
 
 ## API Gateway Routes
 
-| Route | Target | Description |
-|-------|--------|-------------|
-| `/` | Gateway docs | API documentation |
-| `/backstage/*` | Backstage:7007 | Portal access |
-| `/api/score/*` | Score:8081 | Score REST API |
-| `/webhooks/score/*` | Score:8082 | Score webhooks |
-| `/api/plugins/*` | Plugin Manager:8083 | Plugin API |
-| `/che/*` | Che:8080 | Eclipse Che |
+| Route               | Target              | Description       |
+| ------------------- | ------------------- | ----------------- |
+| `/`                 | Gateway docs        | API documentation |
+| `/backstage/*`      | Backstage:7007      | Portal access     |
+| `/api/score/*`      | Score:8081          | Score REST API    |
+| `/webhooks/score/*` | Score:8082          | Score webhooks    |
+| `/api/plugins/*`    | Plugin Manager:8083 | Plugin API        |
+| `/che/*`            | Che:8080            | Eclipse Che       |
 
 ## Environment Variables
 
@@ -199,6 +213,7 @@ LOG_LEVEL=info
 ## Troubleshooting
 
 ### Service won't start
+
 ```bash
 # Check logs
 docker compose logs [service-name]
@@ -212,6 +227,7 @@ docker compose up -d [service-name]
 ```
 
 ### Database connection issues
+
 ```bash
 # Test connection
 docker compose exec postgres psql -U backstage -d backstage -c "SELECT 1"
@@ -224,6 +240,7 @@ docker compose logs postgres
 ```
 
 ### Reset everything
+
 ```bash
 # WARNING: Deletes all data
 docker compose down -v
@@ -258,22 +275,26 @@ curl -v http://localhost:8000/health
 ## Common Workflows
 
 ### Deploy New Workload
+
 1. Create Score spec: `POST /api/v1/specs`
 2. Verify spec: `GET /api/v1/specs/{name}`
 3. Trigger pipeline: `POST /webhooks/pipeline/trigger`
 4. Check status: `GET /api/v1/pipelines/{name}`
 
 ### Add Custom Plugin
+
 1. Create plugin code in `score-service/plugins/`
 2. Restart service: `docker compose restart score-service`
 3. Verify: `curl http://localhost:8081/api/v1/plugins`
 
 ### Access Development Environment
+
 1. Open Che: http://localhost:8080
 2. Create workspace
 3. Start coding
 
 ### Update Configuration
+
 1. Edit `.env` file
 2. Restart services: `docker compose up -d`
 
@@ -282,6 +303,7 @@ curl -v http://localhost:8000/health
 ⚠️ **This configuration is for development only!**
 
 For production:
+
 - Enable authentication
 - Use HTTPS
 - Restrict CORS

@@ -10,7 +10,7 @@ backend:
   listen:
     port: 7007
   csp:
-    connect-src: ["'self'", 'http:', 'https:']
+    connect-src: ["'self'", "http:", "https:"]
   cors:
     origin: ${APP_BASE_URL}
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
@@ -49,7 +49,8 @@ catalog:
     - type: file
       target: /app/catalog/all.yaml
       rules:
-        - allow: [Component, System, API, Resource, Location, Template, User, Group]
+        - allow:
+            [Component, System, API, Resource, Location, Template, User, Group]
     # Score workload templates
     - type: file
       target: /app/catalog/templates/score-workload.yaml
@@ -74,29 +75,29 @@ plugins:
 
 # Proxy configuration for external services
 proxy:
-  '/score-api':
-    target: 'http://score-service:8081'
+  "/score-api":
+    target: "http://score-service:8081"
     changeOrigin: true
     pathRewrite:
-      '^/score-api': '/'
-  '/che-api':
-    target: 'http://che:8080'
+      "^/score-api": "/"
+  "/che-api":
+    target: "http://che:8080"
     changeOrigin: true
     pathRewrite:
-      '^/che-api': '/'
-  '/plugin-manager':
-    target: 'http://plugin-manager:8083'
+      "^/che-api": "/"
+  "/plugin-manager":
+    target: "http://plugin-manager:8083"
     changeOrigin: true
     pathRewrite:
-      '^/plugin-manager': '/'
+      "^/plugin-manager": "/"
 
 # Kubernetes promotion path configuration
 kubernetes:
   # These settings support promotion to K8s
   serviceLocatorMethod:
-    type: 'multiTenant'
+    type: "multiTenant"
   clusterLocatorMethods:
-    - type: 'config'
+    - type: "config"
       clusters: []
 
 # Scaffolder templates for workload deployment

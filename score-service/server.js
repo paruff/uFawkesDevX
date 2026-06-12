@@ -75,9 +75,9 @@ async function loadPlugins() {
           console.warn(`Skipping plugin with invalid filename: ${file}`);
           continue;
         }
-        
+
         const pluginPath = path.join(PLUGINS_DIR, file);
-        
+
         // Ensure the resolved path is still within PLUGINS_DIR
         const resolvedPath = path.resolve(pluginPath);
         const resolvedPluginDir = path.resolve(PLUGINS_DIR);
@@ -85,7 +85,7 @@ async function loadPlugins() {
           console.warn(`Skipping plugin outside plugins directory: ${file}`);
           continue;
         }
-        
+
         try {
           const plugin = require(pluginPath);
           if (plugin.name && typeof plugin.name === 'string') {
@@ -119,7 +119,7 @@ async function initDatabase() {
         updated_at TIMESTAMP DEFAULT NOW()
       );
     `);
-    
+
     await client.query(`
       CREATE TABLE IF NOT EXISTS pipeline_runs (
         id SERIAL PRIMARY KEY,
@@ -131,7 +131,7 @@ async function initDatabase() {
         completed_at TIMESTAMP
       );
     `);
-    
+
     console.log('Database initialized');
   } finally {
     client.release();
@@ -166,11 +166,11 @@ apiApp.get('/api/v1/specs/:name', async (req, res) => {
       'SELECT * FROM score_specs WHERE name = $1',
       [name]
     );
-    
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Spec not found' });
     }
-    
+
     res.json(result.rows[0]);
   } catch (error) {
     console.error('Error getting spec:', error);
@@ -182,7 +182,7 @@ apiApp.get('/api/v1/specs/:name', async (req, res) => {
 apiApp.post('/api/v1/specs', async (req, res) => {
   try {
     const spec = req.body;
-    
+
     // Validate the Score spec
     const valid = validateScore(spec);
     if (!valid) {
@@ -191,16 +191,16 @@ apiApp.post('/api/v1/specs', async (req, res) => {
         details: validateScore.errors,
       });
     }
-    
+
     const name = spec.metadata.name;
-    
+
     // Validate name to prevent path traversal
     if (!/^[a-z0-9-]+$/.test(name)) {
       return res.status(400).json({
         error: 'Invalid workload name. Use only lowercase letters, numbers, and hyphens.',
       });
     }
-    
+
     // Run validation plugins
     for (const [pluginName, plugin] of plugins) {
       if (plugin.validateSpec) {
@@ -213,7 +213,7 @@ apiApp.post('/api/v1/specs', async (req, res) => {
         }
       }
     }
-    
+
     // Save spec to database
     const result = await pool.query(
       `INSERT INTO score_specs (name, spec, status)
@@ -223,11 +223,11 @@ apiApp.post('/api/v1/specs', async (req, res) => {
        RETURNING *`,
       [name, JSON.stringify(spec)]
     );
-    
+
     // Save spec to file system
     const specPath = path.join(SPECS_DIR, `${name}.yaml`);
     await fs.writeFile(specPath, YAML.stringify(spec));
-    
+
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Error creating spec:', error);
@@ -243,11 +243,11 @@ apiApp.delete('/api/v1/specs/:name', async (req, res) => {
       'DELETE FROM score_specs WHERE name = $1 RETURNING *',
       [name]
     );
-    
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Spec not found' });
     }
-    
+
     // Delete spec file
     const specPath = path.join(SPECS_DIR, `${name}.yaml`);
     try {
@@ -255,7 +255,7 @@ apiApp.delete('/api/v1/specs/:name', async (req, res) => {
     } catch (error) {
       console.log('Spec file not found:', error.message);
     }
-    
+
     res.json({ message: 'Spec deleted', spec: result.rows[0] });
   } catch (error) {
     console.error('Error deleting spec:', error);
@@ -302,11 +302,11 @@ webhookApp.get('/health', (req, res) => {
 webhookApp.post('/webhooks/pipeline/trigger', async (req, res) => {
   try {
     const { workload, action, metadata } = req.body;
-    
+
     if (!workload || !action) {
       return res.status(400).json({ error: 'workload and action are required' });
     }
-    
+
     // Create pipeline run
     const result = await pool.query(
       `INSERT INTO pipeline_runs (workload, action, status, metadata)
@@ -314,9 +314,9 @@ webhookApp.post('/webhooks/pipeline/trigger', async (req, res) => {
        RETURNING *`,
       [workload, action, JSON.stringify(metadata || {})]
     );
-    
+
     const pipelineRun = result.rows[0];
-    
+
     // Trigger plugins
     for (const [pluginName, plugin] of plugins) {
       if (plugin.onPipelineTrigger) {
@@ -327,7 +327,7 @@ webhookApp.post('/webhooks/pipeline/trigger', async (req, res) => {
         }
       }
     }
-    
+
     // Simulate pipeline execution (in real implementation, this would trigger actual pipeline)
     setTimeout(async () => {
       try {
@@ -348,7 +348,7 @@ webhookApp.post('/webhooks/pipeline/trigger', async (req, res) => {
         }
       }
     }, 5000);
-    
+
     res.status(202).json({
       message: 'Pipeline triggered',
       pipelineRun,
@@ -364,9 +364,9 @@ webhookApp.post('/webhooks/:integration/:event', async (req, res) => {
   try {
     const { integration, event } = req.params;
     const payload = req.body;
-    
+
     console.log(`Webhook received: ${integration}/${event}`, payload);
-    
+
     // Trigger integration plugins
     for (const [pluginName, plugin] of plugins) {
       if (plugin.onWebhook) {
@@ -377,7 +377,7 @@ webhookApp.post('/webhooks/:integration/:event', async (req, res) => {
         }
       }
     }
-    
+
     res.json({ message: 'Webhook received', integration, event });
   } catch (error) {
     console.error('Error processing webhook:', error);
@@ -414,11 +414,11 @@ async function start() {
   try {
     await initDatabase();
     await loadPlugins();
-    
+
     apiApp.listen(API_PORT, () => {
       console.log(`Score API server listening on port ${API_PORT}`);
     });
-    
+
     webhookApp.listen(WEBHOOK_PORT, () => {
       console.log(`Score Webhook server listening on port ${WEBHOOK_PORT}`);
     });

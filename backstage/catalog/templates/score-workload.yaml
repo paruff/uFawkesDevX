@@ -21,7 +21,7 @@ spec:
           title: Name
           type: string
           description: Unique name for the workload
-          pattern: '^[a-z0-9-]+$'
+          pattern: "^[a-z0-9-]+$"
         description:
           title: Description
           type: string
@@ -52,11 +52,11 @@ spec:
             cpu:
               title: CPU
               type: string
-              default: '100m'
+              default: "100m"
             memory:
               title: Memory
               type: string
-              default: '128Mi'
+              default: "128Mi"
   steps:
     - id: create-score-spec
       name: Create Score Specification

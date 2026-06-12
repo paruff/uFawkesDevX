@@ -84,6 +84,7 @@ The platform includes a pre-configured template. Access it via Backstage:
 5. Click "Create"
 
 The template will automatically:
+
 - Create the Score specification
 - Validate it
 - Trigger the deployment pipeline
@@ -120,35 +121,35 @@ module.exports = {
   name: 'my-custom-plugin',
   version: '1.0.0',
   description: 'Custom validation and enhancement plugin',
-  
+
   async validateSpec(spec) {
     const errors = [];
-    
+
     // Check for required annotations
     if (!spec.metadata.annotations?.team) {
       errors.push('Missing required annotation: team');
     }
-    
+
     if (!spec.metadata.annotations?.env) {
       errors.push('Missing required annotation: env');
     }
-    
+
     // Check resource limits
     for (const [name, container] of Object.entries(spec.containers || {})) {
       if (!spec.resources?.limits) {
         errors.push(\`Container \${name} missing resource limits\`);
       }
     }
-    
+
     return {
       valid: errors.length === 0,
       errors
     };
   },
-  
+
   async onPipelineTrigger(workload, action, metadata) {
     console.log(\`Custom plugin: Processing \${action} for \${workload}\`);
-    
+
     // Add custom pipeline logic here
     // For example, notify Slack, update JIRA, etc.
   }
@@ -211,27 +212,27 @@ Create a plugin to handle custom webhook events:
 ```javascript
 // custom-webhook-plugin.js
 module.exports = {
-  name: 'custom-webhook-handler',
-  version: '1.0.0',
-  
+  name: "custom-webhook-handler",
+  version: "1.0.0",
+
   async onWebhook(integration, event, payload) {
-    if (integration === 'github' && event === 'push') {
+    if (integration === "github" && event === "push") {
       // Extract branch and commit info
-      const branch = payload.ref.replace('refs/heads/', '');
+      const branch = payload.ref.replace("refs/heads/", "");
       const commit = payload.after;
-      
+
       // Auto-deploy main branch
-      if (branch === 'main') {
+      if (branch === "main") {
         console.log(`Auto-deploying commit ${commit}`);
         // Trigger deployment logic
       }
     }
-    
-    if (integration === 'jira' && event === 'issue_updated') {
+
+    if (integration === "jira" && event === "issue_updated") {
       // Handle JIRA webhook
       console.log(`JIRA issue ${payload.issue.key} updated`);
     }
-  }
+  },
 };
 ```
 
@@ -261,8 +262,8 @@ components:
     image: node:18
     memoryLimit: 2Gi
     mountSources: true
-    command: ['tail']
-    args: ['-f', '/dev/null']
+    command: ["tail"]
+    args: ["-f", "/dev/null"]
 commands:
   - name: Deploy to Dev
     actions:
@@ -423,13 +424,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Create Score Spec
         run: |
           curl -X POST ${{ secrets.PLATFORM_URL }}/api/score/specs \
             -H "Content-Type: application/json" \
             -d @score.yaml
-      
+
       - name: Trigger Deployment
         run: |
           curl -X POST ${{ secrets.PLATFORM_URL }}/webhooks/score/pipeline/trigger \
@@ -443,7 +444,7 @@ jobs:
                 "actor": "${{ github.actor }}"
               }
             }'
-      
+
       - name: Wait for Deployment
         run: |
           sleep 30

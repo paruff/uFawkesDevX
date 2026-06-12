@@ -19,50 +19,51 @@ Create a new plugin file in `score-service/plugins/`:
 ```javascript
 // my-custom-plugin.js
 module.exports = {
-  name: 'my-custom-plugin',
-  version: '1.0.0',
-  description: 'My custom validation and automation plugin',
-  
+  name: "my-custom-plugin",
+  version: "1.0.0",
+  description: "My custom validation and automation plugin",
+
   // Validate Score specifications
   async validateSpec(spec) {
     const errors = [];
-    
+
     // Add your validation logic
     if (!spec.metadata.annotations?.owner) {
-      errors.push('Missing required annotation: owner');
+      errors.push("Missing required annotation: owner");
     }
-    
+
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   },
-  
+
   // Handle pipeline triggers
   async onPipelineTrigger(workload, action, metadata) {
     console.log(`Processing ${action} for ${workload}`);
-    
+
     // Add your automation logic
     // Examples:
     // - Send notifications
     // - Update external systems
     // - Trigger additional workflows
   },
-  
+
   // Handle webhook events
   async onWebhook(integration, event, payload) {
     console.log(`Received webhook: ${integration}/${event}`);
-    
+
     // Process webhook payload
     // Examples:
     // - GitHub push events
     // - JIRA updates
     // - External system notifications
-  }
+  },
 };
 ```
 
 **Testing Your Plugin**:
+
 ```bash
 # Restart Score service to load plugin
 docker compose restart score-service
@@ -104,6 +105,7 @@ Create plugin following [Backstage plugin development guide](https://backstage.i
 ### Modifying Score Service
 
 1. **Edit the code**:
+
 ```bash
 # Edit service
 vi score-service/server.js
@@ -113,20 +115,22 @@ docker compose exec score-service sh
 ```
 
 2. **Add new endpoint**:
+
 ```javascript
 // In score-service/server.js
-apiApp.get('/api/v1/custom-endpoint', async (req, res) => {
+apiApp.get("/api/v1/custom-endpoint", async (req, res) => {
   try {
     // Your logic here
-    res.json({ message: 'Custom endpoint' });
+    res.json({ message: "Custom endpoint" });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Internal error' });
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal error" });
   }
 });
 ```
 
 3. **Rebuild and test**:
+
 ```bash
 docker compose build score-service
 docker compose up -d score-service
@@ -151,6 +155,7 @@ location /custom-route/ {
 ```
 
 Restart gateway:
+
 ```bash
 docker compose restart gateway
 ```
@@ -173,7 +178,7 @@ metadata:
 spec:
   owner: platform-team
   type: service
-  
+
   parameters:
     - title: Service Information
       required:
@@ -183,11 +188,11 @@ spec:
         name:
           title: Name
           type: string
-          pattern: '^[a-z0-9-]+$'
+          pattern: "^[a-z0-9-]+$"
         owner:
           title: Owner
           type: string
-  
+
   steps:
     - id: create-spec
       name: Create Score Specification
@@ -204,7 +209,7 @@ spec:
           containers:
             app:
               image: my-app:latest
-    
+
     - id: trigger-pipeline
       name: Deploy
       action: http:post
@@ -213,7 +218,7 @@ spec:
         body:
           workload: ${{ parameters.name }}
           action: deploy
-  
+
   output:
     links:
       - title: View Service
@@ -221,6 +226,7 @@ spec:
 ```
 
 Register template in `backstage/catalog/all.yaml`:
+
 ```yaml
 spec:
   targets:
@@ -235,16 +241,16 @@ For JavaScript services, add tests:
 
 ```javascript
 // score-service/__tests__/validation.test.js
-const { validateScore } = require('../server.js');
+const { validateScore } = require("../server.js");
 
-describe('Score Validation', () => {
-  test('valid spec passes', () => {
+describe("Score Validation", () => {
+  test("valid spec passes", () => {
     const spec = {
-      apiVersion: 'score.dev/v1b1',
-      metadata: { name: 'test' },
-      containers: { app: { image: 'nginx' } }
+      apiVersion: "score.dev/v1b1",
+      metadata: { name: "test" },
+      containers: { app: { image: "nginx" } },
     };
-    
+
     const valid = validateScore(spec);
     expect(valid).toBe(true);
   });
@@ -252,6 +258,7 @@ describe('Score Validation', () => {
 ```
 
 Run tests:
+
 ```bash
 cd score-service
 npm install --dev jest
@@ -261,11 +268,13 @@ npm test
 ### Integration Testing
 
 Use the provided test script:
+
 ```bash
 ./test-platform.sh
 ```
 
 Or create custom tests:
+
 ```bash
 # Test new endpoint
 curl -X POST http://localhost:8081/api/v1/custom-endpoint \
@@ -276,6 +285,7 @@ curl -X POST http://localhost:8081/api/v1/custom-endpoint \
 ### Load Testing
 
 For performance testing:
+
 ```bash
 # Install Apache Bench
 apt-get install apache2-utils
@@ -373,6 +383,7 @@ services:
 ### Debugging
 
 Enable debug logging:
+
 ```bash
 # In .env
 LOG_LEVEL=debug
@@ -380,11 +391,13 @@ NODE_ENV=development
 ```
 
 View detailed logs:
+
 ```bash
 docker compose logs -f score-service
 ```
 
 Access service shell:
+
 ```bash
 docker compose exec score-service sh
 ```
@@ -394,6 +407,7 @@ docker compose exec score-service sh
 ### Add New Database Table
 
 1. Create migration script in `postgres/init/`:
+
 ```sql
 -- 02-add-custom-table.sql
 CREATE TABLE IF NOT EXISTS custom_data (
@@ -405,6 +419,7 @@ CREATE TABLE IF NOT EXISTS custom_data (
 ```
 
 2. Rebuild database:
+
 ```bash
 docker compose down postgres
 docker volume rm developerd_postgres-data
@@ -414,6 +429,7 @@ docker compose up -d postgres
 ### Add New Service
 
 1. Create service directory:
+
 ```bash
 mkdir my-service
 ```
@@ -421,6 +437,7 @@ mkdir my-service
 2. Add Dockerfile, package.json, server.js
 
 3. Add to docker-compose.yml:
+
 ```yaml
 services:
   my-service:
@@ -437,6 +454,7 @@ services:
 ### Change Service Port
 
 1. Update `.env`:
+
 ```bash
 SCORE_API_PORT=8085
 ```
@@ -444,6 +462,7 @@ SCORE_API_PORT=8085
 2. Update docker-compose.yml if using hardcoded port
 
 3. Restart:
+
 ```bash
 docker compose up -d
 ```
@@ -451,6 +470,7 @@ docker compose up -d
 ## Troubleshooting Development Issues
 
 ### Service won't start
+
 ```bash
 # Check logs
 docker compose logs <service>
@@ -461,6 +481,7 @@ docker compose up -d <service>
 ```
 
 ### Database issues
+
 ```bash
 # Reset database
 docker compose down
@@ -469,6 +490,7 @@ docker compose up -d
 ```
 
 ### Port conflicts
+
 ```bash
 # Change port in .env
 SCORE_API_PORT=8090
@@ -478,6 +500,7 @@ docker compose up -d
 ```
 
 ### Permission issues
+
 ```bash
 # Fix file permissions
 chmod +x test-platform.sh

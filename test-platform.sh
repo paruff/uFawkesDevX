@@ -18,9 +18,9 @@ test_endpoint() {
     local name=$1
     local url=$2
     local expected_code=${3:-200}
-    
+
     echo -n "Testing $name... "
-    
+
     if response=$(curl -s -o /dev/null -w "%{http_code}" "$url" 2>/dev/null); then
         if [ "$response" -eq "$expected_code" ]; then
             echo -e "${GREEN}✓${NC} (HTTP $response)"
