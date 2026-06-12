@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Control Plane - API Gateway</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .tagline { font-size: 1.1rem; opacity: 0.9; }
+        .content { padding: 2rem; }
+        .services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .service-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+        .service-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+        .service-card h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+        .service-card p { color: #666; margin-bottom: 1rem; }
+        .endpoints {
+            background: #f5f5f5;
+            border-radius: 4px;
+            padding: 0.75rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+        .endpoint {
+            margin: 0.25rem 0;
+            color: #333;
+        }
+        .method {
+            display: inline-block;
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+        }
+        .get { background: #61affe; color: white; }
+        .post { background: #49cc90; color: white; }
+        .put { background: #fca130; color: white; }
+        .delete { background: #f93e3e; color: white; }
+        .section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e0e0e0;
+        }
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        .feature-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .feature-list li {
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+        footer {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Developer Control Plane</h1>
+            <p class="tagline">Unified API Gateway for Internal Developer Platform</p>
+        </header>
+        
+        <div class="content">
+            <div class="section">
+                <h2>🚀 Platform Services</h2>
+                <div class="services">
+                    <div class="service-card">
+                        <h3>Backstage Portal</h3>
+                        <p>Developer portal for service catalog and templates</p>
+                        <div class="endpoints">
+                            <div class="endpoint">
+                                <span class="method get">GET</span>
+                                <a href="/backstage" target="_blank">/backstage</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="service-card">
+                        <h3>Score Service</h3>
+                        <p>Workload specification management and validation</p>
+                        <div class="endpoints">
+                            <div class="endpoint">
+                                <span class="method get">GET</span>/api/score/specs
+                            </div>
+                            <div class="endpoint">
+                                <span class="method post">POST</span>/api/score/specs
+                            </div>
+                            <div class="endpoint">
+                                <span class="method get">GET</span>/api/score/pipelines
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="service-card">
+                        <h3>Eclipse Che</h3>
+                        <p>Cloud development environments</p>
+                        <div class="endpoints">
+                            <div class="endpoint">
+                                <span class="method get">GET</span>
+                                <a href="/che" target="_blank">/che</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="service-card">
+                        <h3>Plugin Manager</h3>
+                        <p>Platform extension points and plugins</p>
+                        <div class="endpoints">
+                            <div class="endpoint">
+                                <span class="method get">GET</span>/api/plugins/plugins
+                            </div>
+                            <div class="endpoint">
+                                <span class="method post">POST</span>/api/plugins/plugins
+                            </div>
+                            <div class="endpoint">
+                                <span class="method get">GET</span>/api/plugins/extension-points
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🔗 Webhook Endpoints</h2>
+                <div class="endpoints">
+                    <div class="endpoint">
+                        <span class="method post">POST</span>/webhooks/score/pipeline/trigger - Trigger deployment pipeline
+                    </div>
+                    <div class="endpoint">
+                        <span class="method post">POST</span>/webhooks/score/:integration/:event - Generic integration webhooks
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>✨ Platform Features</h2>
+                <ul class="feature-list">
+                    <li>📦 Score Workload Specifications</li>
+                    <li>🎯 Pipeline Trigger Integration</li>
+                    <li>🔌 Plugin Architecture</li>
+                    <li>🛠️ Cloud Dev Environments</li>
+                    <li>🏗️ Service Catalog</li>
+                    <li>📋 Scaffolder Templates</li>
+                    <li>🔐 Local Authentication</li>
+                    <li>☸️ Kubernetes Promotion Path</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>📖 Extension Points</h2>
+                <p>The platform provides multiple extension points for custom plugins:</p>
+                <ul class="feature-list">
+                    <li><strong>Score Validators:</strong> Custom spec validation</li>
+                    <li><strong>Pipeline Triggers:</strong> Custom pipeline handlers</li>
+                    <li><strong>Webhook Handlers:</strong> Integration webhooks</li>
+                    <li><strong>Backstage Plugins:</strong> Portal extensions</li>
+                    <li><strong>Che Configurators:</strong> Workspace templates</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Developer Control Plane</strong> | Internal Developer Platform</p>
+            <p>For documentation, see <code>README.md</code> in the repository</p>
+        </footer>
+    </div>
+</body>
+</html>

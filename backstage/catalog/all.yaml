@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: developer-control-plane
+  description: Developer Control Plane Services and Templates
+spec:
+  targets:
+    - ./components.yaml
+    - ./systems.yaml
+    - ./templates/score-workload.yaml

@@ -1,0 +1,99 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: score-workload-template
+  title: Deploy Score Workload
+  description: Create and deploy a workload using Score specification
+  tags:
+    - score
+    - deployment
+    - workload
+spec:
+  owner: platform-team
+  type: service
+  parameters:
+    - title: Workload Information
+      required:
+        - name
+        - description
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Unique name for the workload
+          pattern: '^[a-z0-9-]+$'
+        description:
+          title: Description
+          type: string
+          description: Description of the workload
+        image:
+          title: Container Image
+          type: string
+          description: Container image to deploy
+          default: nginx:latest
+    - title: Score Specification
+      properties:
+        replicas:
+          title: Replicas
+          type: integer
+          description: Number of replicas
+          default: 1
+          minimum: 1
+        port:
+          title: Port
+          type: integer
+          description: Container port
+          default: 8080
+        resources:
+          title: Resources
+          type: object
+          description: Resource requirements
+          properties:
+            cpu:
+              title: CPU
+              type: string
+              default: '100m'
+            memory:
+              title: Memory
+              type: string
+              default: '128Mi'
+  steps:
+    - id: create-score-spec
+      name: Create Score Specification
+      action: http:post
+      input:
+        url: http://score-service:8081/api/v1/specs
+        method: POST
+        headers:
+          Content-Type: application/json
+        body:
+          apiVersion: score.dev/v1b1
+          metadata:
+            name: ${{ parameters.name }}
+          containers:
+            ${{ parameters.name }}:
+              image: ${{ parameters.image }}
+              resources:
+                limits:
+                  cpu: ${{ parameters.resources.cpu }}
+                  memory: ${{ parameters.resources.memory }}
+                requests:
+                  cpu: ${{ parameters.resources.cpu }}
+                  memory: ${{ parameters.resources.memory }}
+    - id: trigger-pipeline
+      name: Trigger Delivery Pipeline
+      action: http:post
+      input:
+        url: http://score-service:8082/webhooks/pipeline/trigger
+        method: POST
+        headers:
+          Content-Type: application/json
+        body:
+          workload: ${{ parameters.name }}
+          action: deploy
+  output:
+    links:
+      - title: View in Score Service
+        url: http://localhost:8081/specs/${{ parameters.name }}
+      - title: Pipeline Status
+        url: http://localhost:8081/pipelines/${{ parameters.name }}
