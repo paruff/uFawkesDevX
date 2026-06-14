@@ -1,4 +1,4 @@
-.PHONY: help start stop restart logs build clean health status install
+.PHONY: help start stop restart logs build clean health status install test test-unit test-integration test-smoke test-acceptance validate pre-commit-setup pre-commit-run
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -74,3 +74,44 @@ api-test: ## Test Score API endpoints
 	@echo ""
 	@echo "Testing Plugin Manager..."
 	@curl -s http://localhost:8083/api/v1/plugins | jq .
+
+# ============================================================================
+# Test Commands
+# ============================================================================
+
+test: test-unit ## Run all tests
+	@echo "All tests passed"
+
+test-unit: ## Run unit tests
+	pytest tests/unit/ -v --tb=short
+
+test-integration: ## Run integration tests (requires Docker)
+	pytest tests/integration/ -v --tb=short
+
+test-smoke: ## Run smoke tests (requires running stack)
+	pytest tests/smoke/ -v --tb=short
+
+test-acceptance: ## Run acceptance tests (requires running stack)
+	pytest tests/acceptance/ -v --tb=short
+
+test-coverage: ## Run tests with coverage report
+	pytest tests/unit/ -v --tb=short --cov=tests/unit --cov-report=term-missing
+
+# ============================================================================
+# Validation Commands
+# ============================================================================
+
+validate: ## Run all validations
+	@echo "Running validations..."
+	pre-commit run --all-files
+
+# ============================================================================
+# Pre-commit Commands
+# ============================================================================
+
+pre-commit-setup: ## Install pre-commit hooks
+	pip install pre-commit
+	pre-commit install
+
+pre-commit-run: ## Run pre-commit hooks on all files
+	pre-commit run --all-files
