@@ -3,8 +3,9 @@
 **Failure:** CI Pipeline (`ci-pipeline.yml`) — Startup Failure
 **Location:** `.github/workflows/ci-pipeline.yml` line 57-59
 **Evidence:**
+
 - Workflow consistently fails with `startup_failure` across all branches (main, feat/devx-ci-pipeline, dependabot branches)
-- Error from GitHub Actions: *".github/workflows/ci-pipeline.yml (Line: 57, Col: 32): Invalid input, validate-docker-compose is not defined in the referenced workflow. .github/workflows/ci-pipeline.yml (Line: 58, Col: 23): Invalid input, validate-jcasc is not defined in the referenced workflow."*
+- Error from GitHub Actions: _".github/workflows/ci-pipeline.yml (Line: 57, Col: 32): Invalid input, validate-docker-compose is not defined in the referenced workflow. .github/workflows/ci-pipeline.yml (Line: 58, Col: 23): Invalid input, validate-jcasc is not defined in the referenced workflow."_
 - The `build` job passes `validate-docker-compose`, `validate-jcasc`, `validate-k8s` inputs to `reusable-build.yml`, but `reusable-build.yml` does not define those inputs
 - CI (`ci.yml`) succeeds because it doesn't use the broken workflow
 - PR #16 (dependabot: `actions/checkout@v6` → `v7`) was merged to `main` but not applied to this branch

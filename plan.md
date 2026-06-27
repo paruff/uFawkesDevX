@@ -1,5 +1,6 @@
 # uFawkesDevX — Implementation Plan v0.2
-*Lean issues for Deepseek v4 flash implementation*
+
+_Lean issues for Deepseek v4 flash implementation_
 
 **Status:** Draft — 2026-06-23 (revised from DevPod → Coder + devcontainer standard)
 **Branch strategy:** One branch per issue: `feat/DX-001-repo-structure`, etc. PRs to `main`.
@@ -10,20 +11,20 @@
 
 ## Existing issues — disposition
 
-| Issue | Action |
-|---|---|
-| DVX-001 | **Close** — replaced by DX-001 |
-| DVX-002 | **Close** — replaced by DX-008 |
-| DVX-003 | **Close with comment:** "Infisical owned by uFawkesSec. uFawkesDevX consumes secrets from Infisical at runtime; no action in this repo." |
-| DVX-004 | **Close** — replaced by DX-004 (Coder + devcontainer, not Eclipse Che or DevPod) |
-| DVX-005 | **Close** — replaced by DX-005 |
-| DVX-006 | **Close** — replaced by DX-006 |
-| DVX-007 | **Label v0.3** — depends on uFawkesObs |
-| DVX-008 | **Label v0.3** |
-| DVX-009 | **Label v0.3** |
-| DVX-010 | **Close** — replaced by DX-007 |
-| DVX-011 | **Close** — replaced by DX-002 |
-| GITOPS-001 | **Label v0.3** |
+| Issue      | Action                                                                                                                                   |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| DVX-001    | **Close** — replaced by DX-001                                                                                                           |
+| DVX-002    | **Close** — replaced by DX-008                                                                                                           |
+| DVX-003    | **Close with comment:** "Infisical owned by uFawkesSec. uFawkesDevX consumes secrets from Infisical at runtime; no action in this repo." |
+| DVX-004    | **Close** — replaced by DX-004 (Coder + devcontainer, not Eclipse Che or DevPod)                                                         |
+| DVX-005    | **Close** — replaced by DX-005                                                                                                           |
+| DVX-006    | **Close** — replaced by DX-006                                                                                                           |
+| DVX-007    | **Label v0.3** — depends on uFawkesObs                                                                                                   |
+| DVX-008    | **Label v0.3**                                                                                                                           |
+| DVX-009    | **Label v0.3**                                                                                                                           |
+| DVX-010    | **Close** — replaced by DX-007                                                                                                           |
+| DVX-011    | **Close** — replaced by DX-002                                                                                                           |
+| GITOPS-001 | **Label v0.3**                                                                                                                           |
 
 ---
 
@@ -47,28 +48,31 @@
 **Branch:** `feat/DX-001-repo-structure`
 
 ### Context
+
 The repo contains only `LICENSE` and `README.md`. No tooling, directories, or tests exist.
 This issue lays the scaffold every subsequent issue builds on. Closes DVX-001.
 
 ### Acceptance criteria
+
 - [ ] `.pre-commit-config.yaml` created with hooks: `gitleaks` v8.18.2, `detect-secrets`,
-  `yamllint`, `markdownlint-cli`, `prettier`
+      `yamllint`, `markdownlint-cli`, `prettier`
 - [ ] `.gitleaks.toml` created (minimal config — standard default rules only, no custom patterns)
 - [ ] `.secrets.baseline` generated: `detect-secrets scan > .secrets.baseline`
 - [ ] `.yamllint` created (max line length 120)
 - [ ] `.markdownlint.json` created (disable MD013 for tables)
 - [ ] `.env.example` created with all config variables and comments; no secret values;
-  includes `DOCKER_GID`, `CODER_ACCESS_URL`, `CODER_DB_PASSWORD` (placeholder),
-  `BACKSTAGE_DB_PASSWORD` (placeholder), `APP_BASE_URL`, `WOODPECKER_WEBHOOK_URL`
+      includes `DOCKER_GID`, `CODER_ACCESS_URL`, `CODER_DB_PASSWORD` (placeholder),
+      `BACKSTAGE_DB_PASSWORD` (placeholder), `APP_BASE_URL`, `WOODPECKER_WEBHOOK_URL`
 - [ ] `tests/unit/__init__.py` created (empty)
 - [ ] `tests/requirements.txt` created: `pytest`, `pyyaml`
 - [ ] Directory skeleton created: `backstage/`, `score-service/`, `plugin-manager/`,
-  `gateway/`, `coder/templates/devcontainer-docker/`, `templates/`, `devcontainer/`,
-  `catalog/`, `docs/`, `tests/unit/`
+      `gateway/`, `coder/templates/devcontainer-docker/`, `templates/`, `devcontainer/`,
+      `catalog/`, `docs/`, `tests/unit/`
 - [ ] `Makefile` skeleton: `pre-commit-setup`, `pre-commit-run`, `test`, `help` targets
 - [ ] `pre-commit run --all-files` passes on files created in this issue
 
 ### Implementation notes for Deepseek
+
 Do not write any content into subdirectories beyond empty `.gitkeep` files — those
 are filled by subsequent issues. The `.env.example` should document every variable
 that will eventually appear in `compose.yaml`, even though `compose.yaml` does not
@@ -84,6 +88,7 @@ exist yet. This gives the operator a complete reference before starting.
 **Branch:** `feat/DX-002-compose`
 
 ### Context
+
 The largest single issue. Creates the full service stack: Coder, Backstage, Score,
 Plugin Manager, Gateway. Removes Postgres (to uFawkesRes) and Eclipse Che (replaced
 by Coder). Closes DVX-011.
@@ -91,11 +96,12 @@ by Coder). Closes DVX-011.
 ### Acceptance criteria
 
 **`compose.yaml`:**
+
 - [ ] Exactly 5 services: `coder`, `backstage`, `score-service`, `plugin-manager`, `gateway`
 - [ ] `postgres` service absent; `eclipse-che` service absent
 - [ ] `coder` image: `ghcr.io/coder/coder:2.34.3` (pinned)
 - [ ] `coder` has `CODER_PG_CONNECTION_URL` pointing to `postgres:5432`, `CODER_HTTP_ADDRESS`,
-  `CODER_ACCESS_URL`, `CODER_TELEMETRY_ENABLE: "false"`
+      `CODER_ACCESS_URL`, `CODER_TELEMETRY_ENABLE: "false"`
 - [ ] `coder` mounts `/var/run/docker.sock:/var/run/docker.sock`
 - [ ] `coder` has `group_add: ["${DOCKER_GID}"]`
 - [ ] `coder` has `coder-home` named volume at `/home/coder/.config`
@@ -107,31 +113,36 @@ by Coder). Closes DVX-011.
 - [ ] `volumes` top-level block declares `coder-home`
 
 **`backstage/Dockerfile`:**
+
 - [ ] Multi-stage: stage 1 `node:20-alpine` builds the Backstage app; stage 2 `node:20-alpine`
-  runs it (verify Node.js version against P6 Backstage target version before writing)
+      runs it (verify Node.js version against P6 Backstage target version before writing)
 - [ ] `COPY app-config.yaml /app/app-config.yaml`
 - [ ] `COPY ../../catalog /app/catalog` (copies catalog entries into image)
 - [ ] Final `CMD` starts the Backstage backend with the config file
 
 **`backstage/app-config.yaml`:**
+
 - [ ] Created per design.md §5: `app`, `backend.database` (pointing to `postgres:5432`),
-  `catalog.locations` (5 absolute `/app/catalog/` paths), `auth.providers: {}`
+      `catalog.locations` (5 absolute `/app/catalog/` paths), `auth.providers: {}`
 - [ ] No secret values; password read via `$env: POSTGRES_PASSWORD`
 
 **`gateway/nginx.conf`:**
+
 - [ ] Created per design.md §6: routes `/backstage/`, `/api/score/`, `/webhooks/score/`,
-  `/api/plugins/`, `/health` to correct upstream services
+      `/api/plugins/`, `/health` to correct upstream services
 
 **`score-service/Dockerfile`** and **`plugin-manager/Dockerfile`:**
+
 - [ ] Created or verified present (resolve P5 first)
 - [ ] If creating from scratch: minimal Node.js 20 Alpine image with `npm install` and `npm start`
 
 **`Makefile`** (extend DX-001 skeleton):
+
 - [ ] `network` target: `docker network create fawkes-net || true`
 - [ ] `build` target: `docker compose build`
 - [ ] `up` target: calls `make network`, then `docker compose up -d`, then prints service URLs
 - [ ] `up` target: prints a **warning** if `CODER_ACCESS_URL` contains the string `localhost`
-  (use `grep -q localhost .env && echo "WARNING: CODER_ACCESS_URL must not be localhost"`)
+      (use `grep -q localhost .env && echo "WARNING: CODER_ACCESS_URL must not be localhost"`)
 - [ ] `down` target: `docker compose down`
 - [ ] `logs-coder`, `logs-backstage` targets
 - [ ] `check-gid` target with Linux + macOS fallback:
@@ -143,11 +154,13 @@ by Coder). Closes DVX-011.
   ```
 
 **Tests:**
+
 - [ ] `tests/unit/test_compose_yaml.py` created per design.md §9
 - [ ] `pytest tests/unit/test_compose_yaml.py` passes
 - [ ] `yamllint compose.yaml` reports zero errors
 
 ### Implementation notes for Deepseek
+
 `group_add` in Docker Compose expects a list of strings. `${DOCKER_GID}` will be
 an integer when set in `.env`. Docker Compose interpolates it as a string, which is
 correct. Do not cast it or quote it differently.
@@ -171,23 +184,26 @@ come from https://nginx.org/en/docs/http/ngx_http_proxy_module.html.
 **Branch:** `feat/DX-003-score-pipeline`
 
 ### Context
+
 Score translates `score.yaml` to a hardened compose file and triggers the Woodpecker
 pipeline. Without this, Score is a spec storage API only. Same scope as previous plan —
 no change from the Coder migration.
 
 ### Acceptance criteria
+
 - [ ] `score-compose` binary installed in `score-service/Dockerfile`
-  (verify install method at https://github.com/score-spec/score-compose)
+      (verify install method at https://github.com/score-spec/score-compose)
 - [ ] `POST /api/v1/specs` endpoint: validates YAML → runs `score-compose generate` →
-  stores output in named volume → POSTs webhook trigger to `WOODPECKER_WEBHOOK_URL`
+      stores output in named volume → POSTs webhook trigger to `WOODPECKER_WEBHOOK_URL`
 - [ ] Webhook POST is non-blocking: if Woodpecker unreachable, Score returns 202 + logs warning
 - [ ] If P4 is unresolved: implement stub that logs payload to stdout + returns 200 with
-  `# TODO: verify Woodpecker v3 webhook API format` comment — **do not invent the payload**
+      `# TODO: verify Woodpecker v3 webhook API format` comment — **do not invent the payload**
 - [ ] `WOODPECKER_WEBHOOK_URL` documented in `.env.example`
 - [ ] `docs/score-integration.md` created: sequence diagram (text), example `score.yaml`,
-  example generated `docker-compose.yaml`, troubleshooting steps
+      example generated `docker-compose.yaml`, troubleshooting steps
 
 ### Implementation notes for Deepseek
+
 `score-compose` is a standalone binary released at https://github.com/score-spec/score-compose/releases.
 Install it in the Dockerfile via `curl -L <release-url> -o /usr/local/bin/score-compose && chmod +x`.
 Verify the current release URL and binary name before writing the Dockerfile `RUN` instruction.
@@ -202,39 +218,43 @@ Verify the current release URL and binary name before writing the Dockerfile `RU
 **Branch:** `feat/DX-004-coder-devcontainer`
 
 ### Context
+
 This issue replaces Eclipse Che with Coder as the cloud IDE, using the devcontainer
 standard as the environment definition format. It has two parts:
 (A) base devcontainer JSON files in `devcontainer/` that golden path templates reference
 (B) a Coder Terraform workspace template in `coder/templates/devcontainer-docker/` that
-    provisions Docker-backed devcontainer workspaces
+provisions Docker-backed devcontainer workspaces
 
 Closes DVX-004.
 
 ### Acceptance criteria
 
 **Part A — base devcontainer definitions:**
+
 - [ ] `devcontainer/base-python.json` created per design.md §7; `image` field pinned
-  to `mcr.microsoft.com/devcontainers/python:3.12` (verify tag at mcr.microsoft.com)
+      to `mcr.microsoft.com/devcontainers/python:3.12` (verify tag at mcr.microsoft.com)
 - [ ] `devcontainer/base-java.json` — image `mcr.microsoft.com/devcontainers/java:21`
 - [ ] `devcontainer/base-node.json` — image `mcr.microsoft.com/devcontainers/javascript-node:20`
 - [ ] `devcontainer/base-go.json` — image `mcr.microsoft.com/devcontainers/go:1.22`
 - [ ] All four files: `postCreateCommand` installs pre-commit; `remoteUser: vscode`;
-  language-appropriate VS Code extensions; no `:latest` tags
+      language-appropriate VS Code extensions; no `:latest` tags
 - [ ] `tests/unit/test_devcontainer.py` created and passes (validates all four base files)
 
 **Part B — Coder Terraform workspace template:**
+
 - [ ] `coder/templates/devcontainer-docker/main.tf` created as an outline per design.md §4
 - [ ] `main.tf` must have a `# VERIFY` comment on every resource type and field name,
-  referencing https://registry.terraform.io/providers/coder/coder — this file is an
-  outline for human review, not a ready-to-apply template
+      referencing https://registry.terraform.io/providers/coder/coder — this file is an
+      outline for human review, not a ready-to-apply template
 - [ ] `coder/templates/devcontainer-docker/README.md` created documenting:
-  what the template does, how to push it to Coder (`coder templates push`), prerequisites
+      what the template does, how to push it to Coder (`coder templates push`), prerequisites
 - [ ] `Makefile` extended: `coder-push-template` target added per design.md §8
 - [ ] `docs/coder-guide.md` created covering: Coder first-run setup (create admin user),
-  how to push the workspace template, how to create a workspace from a repo with
-  `.devcontainer/devcontainer.json`, how to connect via browser and VS Code SSH
+      how to push the workspace template, how to create a workspace from a repo with
+      `.devcontainer/devcontainer.json`, how to connect via browser and VS Code SSH
 
 ### Implementation notes for Deepseek
+
 The Coder Terraform template in `main.tf` is an **outline for human review** — not
 production-ready Terraform. Every resource type (`coder_agent`, `docker_container`,
 `coder_devcontainer`) must have a `# VERIFY: see https://registry.terraform.io/providers/coder/coder`
@@ -254,24 +274,26 @@ issue — those are manual human steps documented in the template README.
 **Branch:** `feat/DX-005-catalog`
 
 ### Context
+
 Backstage starts with an empty catalog. This issue seeds it with all five uFawkes
 planes so platform engineers can find every service on first startup. Closes DVX-005.
 
 ### Acceptance criteria
+
 - [ ] `catalog/uFawkesDevX.yaml` — `kind: Component`, `type: service`,
-  `owner: platform-team`, links to GitHub repo
+      `owner: platform-team`, links to GitHub repo
 - [ ] `catalog/uFawkesPipe.yaml` — `kind: System` representing the CI/CD plane
 - [ ] `catalog/uFawkesSec.yaml` — `kind: System` representing the security plane
 - [ ] `catalog/uFawkesRes.yaml` — `kind: System` representing the resource plane
 - [ ] `catalog/uFawkesObs.yaml` — `kind: System` representing the observability plane
 - [ ] All 5 files use valid Backstage catalog schema — **VERIFY field names at**
-  **https://backstage.io/docs/features/software-catalog/descriptor-format**
-  **before writing. Do not invent field names.**
+      **https://backstage.io/docs/features/software-catalog/descriptor-format**
+      **before writing. Do not invent field names.**
 - [ ] `backstage/app-config.yaml` `catalog.locations` references all 5 files
-  (already declared in DX-002; verify it is not overwritten)
+      (already declared in DX-002; verify it is not overwritten)
 - [ ] `yamllint catalog/*.yaml` passes
 - [ ] Test in `tests/unit/test_compose_yaml.py` extended: asserts
-  `backstage/app-config.yaml` contains `catalog.locations` with at least 5 entries
+      `backstage/app-config.yaml` contains `catalog.locations` with at least 5 entries
 
 ---
 
@@ -283,30 +305,33 @@ planes so platform engineers can find every service on first startup. Closes DVX
 **Branch:** `feat/DX-006-golden-paths`
 
 ### Context
+
 The core developer-facing deliverable. Four Cookiecutter templates produce complete,
 pipeline-ready app skeletons. Each includes a `.devcontainer/devcontainer.json` that
 Coder will auto-discover. Closes DVX-006.
 
 ### Acceptance criteria
+
 - [ ] `templates/python-flask-app/`, `templates/java-spring-app/`,
-  `templates/node-express-app/`, `templates/go-http-app/` created
+      `templates/node-express-app/`, `templates/go-http-app/` created
 - [ ] Each template `cookiecutter.json` has variables:
-  `project_name`, `project_slug`, `language`, `registry_namespace`
+      `project_name`, `project_slug`, `language`, `registry_namespace`
 - [ ] Each template `{{cookiecutter.project_slug}}/` contains all 6 required files:
-  `.devcontainer/devcontainer.json`, `score.yaml`, `.fawkespipe.yml`, `Dockerfile`,
-  `README.md`, minimal `src/` and `tests/`
+      `.devcontainer/devcontainer.json`, `score.yaml`, `.fawkespipe.yml`, `Dockerfile`,
+      `README.md`, minimal `src/` and `tests/`
 - [ ] `.devcontainer/devcontainer.json` in each template uses the correct MCR base
-  image for the language (matches `devcontainer/base-<lang>.json` from DX-004)
+      image for the language (matches `devcontainer/base-<lang>.json` from DX-004)
 - [ ] `score.yaml` has `apiVersion: score.dev/v1b1` (verify current API version at
-  https://docs.score.dev before writing)
+      https://docs.score.dev before writing)
 - [ ] `.fawkespipe.yml` has `app.name`, `app.language`, `build.builder: cnb`, `stages`
 - [ ] `tests/unit/test_score_contracts.py` created and passes
 - [ ] `tests/unit/test_pipeline_contracts.py` created and passes
 - [ ] `tests/unit/test_devcontainer.py` extended to validate template devcontainer.json files
 - [ ] `docs/golden-paths.md` created: how to use each template, how to open in Coder,
-  how to add a new template language
+      how to add a new template language
 
 ### Implementation notes for Deepseek
+
 Tests operate on raw template files — `{{ cookiecutter.project_slug }}` is treated
 as a literal string (not rendered). Load YAML as string, check structural patterns.
 Do not try to render templates in tests; that requires `cookiecutter` as a dependency
@@ -326,15 +351,17 @@ DX-004. Test this consistency in `test_devcontainer.py`.
 **Branch:** `feat/DX-007-self-ci`
 
 ### Context
+
 No CI exists. PRs merge without any automated check. Closes DVX-010.
 
 ### Acceptance criteria
+
 - [ ] `.woodpecker.yml` created with 3 steps: `lint-yaml`, `lint-markdown`,
-  `contract-tests`
+      `contract-tests`
 - [ ] `lint-yaml`: `python:3.12-slim`, runs `yamllint`; non-blocking (`|| true`)
 - [ ] `lint-markdown`: `node:20-alpine`, runs `markdownlint`; non-blocking (`|| true`)
 - [ ] `contract-tests`: `python:3.12-slim`, installs `tests/requirements.txt`,
-  runs `pytest tests/unit/ -v --tb=short`; **hard gate** (no `|| true`)
+      runs `pytest tests/unit/ -v --tb=short`; **hard gate** (no `|| true`)
 - [ ] `yamllint .woodpecker.yml` passes
 - [ ] Step names consistent with uFawkesPipe convention
 
@@ -348,17 +375,19 @@ No CI exists. PRs merge without any automated check. Closes DVX-010.
 **Branch:** `feat/DX-008-readme-docs`
 
 ### Context
+
 README is empty. Quickstart does not exist. This is always the last issue.
 Closes DVX-002. Merges DVX-004 documentation.
 
 ### Acceptance criteria
 
 **`README.md`:**
+
 - [ ] Title: `uFawkesDevX — Developer Experience Plane`
 - [ ] One-paragraph description: Coder + Backstage + Score + golden paths
 - [ ] ASCII architecture diagram consistent with design.md §1
 - [ ] Services table: 5 services (Coder, Backstage, Score, Plugin Manager, Gateway)
-  with ports and roles; explicitly notes Postgres absent (in uFawkesRes)
+      with ports and roles; explicitly notes Postgres absent (in uFawkesRes)
 - [ ] Quick start: 4-line snippet pointing to `docs/quickstart.md`
 - [ ] Section: Coder cloud IDE — what it is, link to `docs/coder-guide.md`
 - [ ] Section: Golden paths — what they are, link to `docs/golden-paths.md`
@@ -367,31 +396,33 @@ Closes DVX-002. Merges DVX-004 documentation.
 - [ ] `markdownlint README.md` passes
 
 **`docs/quickstart.md`:**
+
 - [ ] Section 0 — Prerequisites: uFawkesRes running; `coder` and `backstage` databases
-  created in uFawkesRes Postgres (include the exact SQL: `CREATE DATABASE coder; CREATE USER coder...`)
+      created in uFawkesRes Postgres (include the exact SQL: `CREATE DATABASE coder; CREATE USER coder...`)
 - [ ] Section 1 — Find your docker GID: `make check-gid`, set `DOCKER_GID` in `.env`
 - [ ] Section 2 — Set `CODER_ACCESS_URL`: explain why `localhost` fails; how to find
-  LAN IP on Linux (`ip route get 1`) and macOS (`ipconfig getifaddr en0`)
+      LAN IP on Linux (`ip route get 1`) and macOS (`ipconfig getifaddr en0`)
 - [ ] Section 3 — Build and start: `make build && make up`
 - [ ] Section 4 — Coder first-run: navigate to `CODER_ACCESS_URL`, create admin user,
-  push workspace template via `make coder-push-template`
+      push workspace template via `make coder-push-template`
 - [ ] Section 5 — Smoke test checklist (8 steps matching spec acceptance criteria)
 - [ ] Troubleshooting: Coder stuck "Connecting..." → check `CODER_ACCESS_URL`;
-  Backstage crash-loop → check DB exists; wrong `DOCKER_GID` → rerun `make check-gid`
+      Backstage crash-loop → check DB exists; wrong `DOCKER_GID` → rerun `make check-gid`
 - [ ] `markdownlint docs/quickstart.md` passes
 
 ---
 
 ## Milestone summary
 
-| Milestone | Issues | Target week |
-|---|---|---|
-| **v0.2-scaffold** | DX-001 | Week 5 |
-| **v0.2-infra** | DX-002, DX-003 | Week 5 |
-| **v0.2-devx** | DX-004, DX-005, DX-006 | Week 6 |
-| **v0.2-ci-docs** | DX-007, DX-008 | Week 6 |
+| Milestone         | Issues                 | Target week |
+| ----------------- | ---------------------- | ----------- |
+| **v0.2-scaffold** | DX-001                 | Week 5      |
+| **v0.2-infra**    | DX-002, DX-003         | Week 5      |
+| **v0.2-devx**     | DX-004, DX-005, DX-006 | Week 6      |
+| **v0.2-ci-docs**  | DX-007, DX-008         | Week 6      |
 
 **Dependency graph:**
+
 ```
 DX-001
   └── DX-002 ──── DX-003
