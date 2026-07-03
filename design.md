@@ -1,5 +1,6 @@
 # uFawkesDevX — Design v0.2
-*Developer Experience Plane of the Fawkes IDP Family*
+
+_Developer Experience Plane of the Fawkes IDP Family_
 
 **Status:** Draft — 2026-06-23
 **Depends on:** devx-specification.md v0.2
@@ -152,7 +153,6 @@ Coder takes the cloud IDE role.
 # Run: make network && make build && make up
 
 services:
-
   coder:
     image: ghcr.io/coder/coder:2.34.3
     container_name: coder
@@ -164,7 +164,7 @@ services:
       # Disable telemetry for self-hosted
       CODER_TELEMETRY_ENABLE: "false"
     group_add:
-      - "${DOCKER_GID}"          # host docker group GID — set in .env
+      - "${DOCKER_GID}" # host docker group GID — set in .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - coder-home:/home/coder/.config
@@ -489,47 +489,47 @@ writing. Only Python and JavaScript-node tag formats were confirmed in search re
 .PHONY: network build up down check-gid logs-coder logs-backstage test help
 
 network: ## Create fawkes-net if it does not exist
-	docker network create fawkes-net || true
+ docker network create fawkes-net || true
 
 check-gid: ## Print the host docker group GID — set this as DOCKER_GID in .env
-	@getent group docker | cut -d: -f3
+ @getent group docker | cut -d: -f3
 
 build: ## Build all custom service images
-	docker compose build
+ docker compose build
 
 up: network ## Start uFawkesDevX stack (requires uFawkesRes running)
-	docker compose up -d
-	@echo ""
-	@echo "  Coder:          http://localhost:7080  (use CODER_ACCESS_URL for workspaces)"
-	@echo "  Backstage:      http://localhost:7007"
-	@echo "  Gateway:        http://localhost:8000"
-	@echo "  Score API:      http://localhost:8081"
-	@echo "  Plugin Manager: http://localhost:8083"
+ docker compose up -d
+ @echo ""
+ @echo "  Coder:          http://localhost:7080  (use CODER_ACCESS_URL for workspaces)"
+ @echo "  Backstage:      http://localhost:7007"
+ @echo "  Gateway:        http://localhost:8000"
+ @echo "  Score API:      http://localhost:8081"
+ @echo "  Plugin Manager: http://localhost:8083"
 
 down: ## Stop stack
-	docker compose down
+ docker compose down
 
 logs-coder: ## Tail Coder logs
-	docker compose logs -f coder
+ docker compose logs -f coder
 
 logs-backstage: ## Tail Backstage logs
-	docker compose logs -f backstage
+ docker compose logs -f backstage
 
 test: ## Run contract tests
-	pytest tests/unit/ -v
+ pytest tests/unit/ -v
 
 pre-commit-setup: ## Install pre-commit hooks
-	pip install pre-commit && pre-commit install
+ pip install pre-commit && pre-commit install
 
 pre-commit-run: ## Run pre-commit on all files
-	pre-commit run --all-files
+ pre-commit run --all-files
 
 coder-push-template: ## Push the devcontainer workspace template to Coder (requires Coder running)
-	cd coder/templates/devcontainer-docker && coder templates push devcontainer-docker
+ cd coder/templates/devcontainer-docker && coder templates push devcontainer-docker
 
 help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
-	  awk 'BEGIN {FS = ":.*?## "}; {printf "  %-25s %s\n", $$1, $$2}'
+ @grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+   awk 'BEGIN {FS = ":.*?## "}; {printf "  %-25s %s\n", $$1, $$2}'
 ```
 
 ---
@@ -537,6 +537,7 @@ help:
 ## 9. Test Design
 
 ### `tests/unit/test_compose_yaml.py`
+
 - Services present: `coder`, `backstage`, `score-service`, `plugin-manager`, `gateway`
 - `postgres` and `eclipse-che` services **absent**
 - `fawkes-net` declared as external network on all services
@@ -546,16 +547,19 @@ help:
 - `coder` service has `/var/run/docker.sock` volume mount
 
 ### `tests/unit/test_devcontainer.py`
+
 - For each `devcontainer/base-*.json`: valid JSON, `image` field present and not `:latest`,
   `postCreateCommand` present, `remoteUser` is `vscode`
 - For each template `templates/*/{{cookiecutter.project_slug}}/.devcontainer/devcontainer.json`:
   valid JSON, `image` field present
 
 ### `tests/unit/test_score_contracts.py`
+
 - For each `templates/*/{{cookiecutter.project_slug}}/score.yaml`:
   valid YAML, `apiVersion == score.dev/v1b1`, `metadata.name` present, `containers` present
 
 ### `tests/unit/test_pipeline_contracts.py`
+
 - For each `templates/*/{{cookiecutter.project_slug}}/.fawkespipe.yml`:
   valid YAML, `app.name`, `app.language`, `build.builder`, `stages` all present,
   `build.builder` in `["cnb", "docker"]`
@@ -564,12 +568,12 @@ help:
 
 ## 10. Risks and Mitigations
 
-| Risk | Likelihood | Mitigation |
-|---|---|---|
-| `CODER_ACCESS_URL` set to `localhost` — workspace containers cannot connect to Coder | **High** (common mistake) | `make up` prints a warning if `CODER_ACCESS_URL` contains `localhost`; `docs/quickstart.md` explains how to find the host LAN IP |
-| Wrong `DOCKER_GID` — Coder cannot reach Docker socket | **High** | `make check-gid` prints the correct GID; quickstart step 1 is always "run make check-gid and set DOCKER_GID in .env" |
-| Backstage crashes on startup because `coder` or `backstage` DB not yet created in uFawkesRes | **High** | `docs/quickstart.md` section 1 is database provisioning; `make up` does not attempt to create DBs |
-| Backstage Docker image takes >10 min to build on first run (Node.js compilation) | **Medium** | Document build time expectation; add `--cache-from` to Dockerfile for incremental builds |
-| Coder Terraform Docker provider schema changes between versions | **Medium** | Pin Coder version (`2.34.3`); document the provider version in `coder/templates/devcontainer-docker/main.tf` |
-| MCR devcontainer image tags verified now but change later | **Low** | Tags are pinned in devcontainer.json files; update via Dependabot or manual review |
-| `getent` command unavailable on macOS for `make check-gid` | **Medium** | Add macOS fallback: `dscl . -read /Groups/docker PrimaryGroupID` or `stat -f %g /var/run/docker.sock` |
+| Risk                                                                                         | Likelihood                | Mitigation                                                                                                                       |
+| -------------------------------------------------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `CODER_ACCESS_URL` set to `localhost` — workspace containers cannot connect to Coder         | **High** (common mistake) | `make up` prints a warning if `CODER_ACCESS_URL` contains `localhost`; `docs/quickstart.md` explains how to find the host LAN IP |
+| Wrong `DOCKER_GID` — Coder cannot reach Docker socket                                        | **High**                  | `make check-gid` prints the correct GID; quickstart step 1 is always "run make check-gid and set DOCKER_GID in .env"             |
+| Backstage crashes on startup because `coder` or `backstage` DB not yet created in uFawkesRes | **High**                  | `docs/quickstart.md` section 1 is database provisioning; `make up` does not attempt to create DBs                                |
+| Backstage Docker image takes >10 min to build on first run (Node.js compilation)             | **Medium**                | Document build time expectation; add `--cache-from` to Dockerfile for incremental builds                                         |
+| Coder Terraform Docker provider schema changes between versions                              | **Medium**                | Pin Coder version (`2.34.3`); document the provider version in `coder/templates/devcontainer-docker/main.tf`                     |
+| MCR devcontainer image tags verified now but change later                                    | **Low**                   | Tags are pinned in devcontainer.json files; update via Dependabot or manual review                                               |
+| `getent` command unavailable on macOS for `make check-gid`                                   | **Medium**                | Add macOS fallback: `dscl . -read /Groups/docker PrimaryGroupID` or `stat -f %g /var/run/docker.sock`                            |

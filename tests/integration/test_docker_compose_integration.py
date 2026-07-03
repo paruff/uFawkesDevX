@@ -1,7 +1,6 @@
 """Integration tests for Docker Compose stack."""
 
 import pytest
-import yaml
 import subprocess
 import time
 import requests
@@ -47,7 +46,13 @@ class TestDockerComposeIntegration:
     def test_jenkins_healthcheck_passes(self):
         """Jenkins health check should pass."""
         result = subprocess.run(
-            ["docker", "inspect", "--format", "{{.State.Health.Status}}", "ufawkespipe-jenkins-1"],
+            [
+                "docker",
+                "inspect",
+                "--format",
+                "{{.State.Health.Status}}",
+                "ufawkespipe-jenkins-1",
+            ],
             capture_output=True,
             text=True,
         )
