@@ -77,6 +77,11 @@ jobs:
         run: |
           pip install pytest pytest-cov pyyaml docker requests
 
+      - name: Prepare environment for Docker Compose
+        run: |
+          cp .env.example .env 2>/dev/null || true
+          echo "Created .env from .env.example"
+
       - name: Start Docker Compose stack
         run: |
           docker compose up -d
@@ -129,6 +134,11 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v7
+
+      - name: Prepare environment for Docker Compose
+        run: |
+          cp .env.example .env 2>/dev/null || true
+          echo "Created .env from .env.example"
 
       - name: Start Docker Compose stack
         run: |
@@ -184,6 +194,11 @@ jobs:
       - name: Install test dependencies
         run: |
           pip install pytest pytest-cov pyyaml docker requests
+
+      - name: Prepare environment for Docker Compose
+        run: |
+          cp .env.example .env 2>/dev/null || true
+          echo "Created .env from .env.example"
 
       - name: Start Docker Compose stack
         run: |
