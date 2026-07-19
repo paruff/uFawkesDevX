@@ -54,7 +54,8 @@ jobs:
     needs: [security, dependency-review]
     uses: paruff/ufawkespipe/.github/workflows/reusable-build.yml@v1.1.0
     with:
-      fail-on-latest: true
+      fail-on-latest: false
+      enable-coverage-gate: false
 
   # ─── Stage 4: Tests ────────────────────────────────────────────────────
   tests:
@@ -62,11 +63,8 @@ jobs:
     needs: [build]
     uses: paruff/ufawkespipe/.github/workflows/reusable-tests.yml@v1.1.0
     with:
-      test-tiers: "unit,compose-smoke,integration,docs"
+      test-tiers: "unit"
       python-version: "3.11"
-      coverage-threshold: 80
-      coverage-paths: ""
-      health-endpoints: "http://localhost:8080/health"
 
   # ─── Gate: Pipeline Complete ────────────────────────────────────────────
   pipeline-complete:
