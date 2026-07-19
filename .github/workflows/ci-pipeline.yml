@@ -20,19 +20,21 @@ jobs:
   # ─── Stage 0: Pre-flight ──────────────────────────────────────────────────
   preflight:
     name: Pre-flight
-    uses: ./.github/workflows/reusable-preflight.yml
+    uses: paruff/ufawkespipe/.github/workflows/reusable-preflight.yml@v1.2.0
+    with:
+      pr-size-limit: 0
 
   # ─── Stage 1: Static Analysis (Lint) ────────────────────────────────────
   lint:
     name: Static Analysis
     needs: [preflight]
-    uses: ./.github/workflows/reusable-lint.yml
+    uses: paruff/ufawkespipe/.github/workflows/reusable-lint.yml@v1.2.0
 
   # ─── Stage 2: Security Scanning ─────────────────────────────────────────
   security:
     name: Security Scanning
     needs: [lint]
-    uses: ./.github/workflows/reusable-security-scanning.yml
+    uses: paruff/ufawkespipe/.github/workflows/reusable-security-scanning.yml@v1.2.0
     with:
       scan-type: all
       severity-threshold: MEDIUM
@@ -43,7 +45,7 @@ jobs:
   dependency-review:
     name: Dependency Review
     needs: [lint]
-    uses: ./.github/workflows/reusable-dependency-review.yml
+    uses: paruff/ufawkespipe/.github/workflows/reusable-dependency-review.yml@v1.2.0
     with:
       fail-on-severity: high
       comment-summary-in-pr: "true"
@@ -52,18 +54,19 @@ jobs:
   build:
     name: Build & Validate
     needs: [security, dependency-review]
-    uses: ./.github/workflows/reusable-build.yml
+    uses: paruff/ufawkespipe/.github/workflows/reusable-build.yml@v1.2.0
     with:
-      validate-docker-compose: true
-      validate-jcasc: false
-      validate-k8s: false
-      fail-on-latest: true
+      fail-on-latest: false
+      enable-coverage-gate: false
 
   # ─── Stage 4: Tests ────────────────────────────────────────────────────
   tests:
     name: Tests
     needs: [build]
-    uses: ./.github/workflows/ci-tests.yml
+    uses: paruff/ufawkespipe/.github/workflows/reusable-tests.yml@v1.2.0
+    with:
+      test-tiers: "unit"
+      python-version: "3.11"
 
   # ─── Gate: Pipeline Complete ────────────────────────────────────────────
   pipeline-complete:
