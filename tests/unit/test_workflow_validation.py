@@ -29,9 +29,9 @@ class TestWorkflowValidation:
         for f in workflow_files:
             with open(f) as fh:
                 config = yaml.safe_load(fh)
-                assert (
-                    "on" in config or True in config
-                ), f"{f.name} missing 'on' trigger"
+                assert "on" in config or True in config, (
+                    f"{f.name} missing 'on' trigger"
+                )
 
     def test_all_have_jobs(self, workflow_files):
         """All workflows must have a 'jobs' section."""
@@ -48,9 +48,9 @@ class TestWorkflowValidation:
                 jobs = config.get("jobs", {})
                 for job_name, job_config in jobs.items():
                     if isinstance(job_config, dict):
-                        assert (
-                            "runs-on" in job_config or "uses" in job_config
-                        ), f"{f.name} job '{job_name}' missing 'runs-on' or 'uses'"
+                        assert "runs-on" in job_config or "uses" in job_config, (
+                            f"{f.name} job '{job_name}' missing 'runs-on' or 'uses'"
+                        )
 
     def test_no_hardcoded_secrets(self, workflow_files):
         """Workflows must not contain hardcoded secrets."""
@@ -67,9 +67,9 @@ class TestWorkflowValidation:
             with open(f) as fh:
                 content = fh.read()
                 for pattern in sensitive_patterns:
-                    assert (
-                        pattern.lower() not in content.lower()
-                    ), f"{f.name} contains hardcoded secret: {pattern}"
+                    assert pattern.lower() not in content.lower(), (
+                        f"{f.name} contains hardcoded secret: {pattern}"
+                    )
 
     def test_use_official_actions(self, workflow_files):
         """Workflows should use official GitHub actions or well-known third-party actions."""
@@ -100,7 +100,9 @@ class TestWorkflowValidation:
                                 assert any(
                                     action.startswith(prefix)
                                     for prefix in allowed_actions
-                                ), f"{f.name} job '{job_name}' uses non-standard action: {action}"
+                                ), (
+                                    f"{f.name} job '{job_name}' uses non-standard action: {action}"
+                                )
 
     def test_timeout_minutes_set(self, workflow_files):
         """Jobs should have timeout-minutes set."""

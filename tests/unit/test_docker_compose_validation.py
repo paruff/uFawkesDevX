@@ -19,9 +19,9 @@ class TestDockerComposeValidation:
     def test_all_services_have_image_or_build(self, docker_compose_config):
         """Every service must have either 'image' or 'build' specified."""
         for service_name, service_config in docker_compose_config["services"].items():
-            assert (
-                "image" in service_config or "build" in service_config
-            ), f"Service '{service_name}' must have 'image' or 'build'"
+            assert "image" in service_config or "build" in service_config, (
+                f"Service '{service_name}' must have 'image' or 'build'"
+            )
 
     def test_no_latest_tags(self, docker_compose_config):
         """No service should use ':latest' image tags (soft check)."""
@@ -62,9 +62,9 @@ class TestDockerComposeValidation:
         for service_name, service_config in docker_compose_config["services"].items():
             if "healthcheck" in service_config:
                 healthcheck = service_config["healthcheck"]
-                assert (
-                    "retries" in healthcheck or "test" in healthcheck
-                ), f"Service '{service_name}' healthcheck missing retries/test"
+                assert "retries" in healthcheck or "test" in healthcheck, (
+                    f"Service '{service_name}' healthcheck missing retries/test"
+                )
 
     def test_no_secrets_in_compose(self, docker_compose_config):
         """No hardcoded secrets or credentials in docker-compose.yml."""
@@ -80,9 +80,9 @@ class TestDockerComposeValidation:
             "PRIVATE_KEY: -----BEGIN",
         ]
         for pattern in sensitive_patterns:
-            assert (
-                pattern.lower() not in content.lower()
-            ), f"Found hardcoded secret '{pattern}' in docker-compose.yml"
+            assert pattern.lower() not in content.lower(), (
+                f"Found hardcoded secret '{pattern}' in docker-compose.yml"
+            )
 
     def test_volumes_are_named(self, docker_compose_config):
         """Volumes should be named, not host paths."""

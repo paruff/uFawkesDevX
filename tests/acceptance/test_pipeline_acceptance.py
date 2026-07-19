@@ -53,9 +53,9 @@ class TestUfawkesPipeAcceptance:
                     "docker-workflow",
                 ]
                 for plugin in required:
-                    assert (
-                        plugin in plugin_names
-                    ), f"Required plugin '{plugin}' not installed"
+                    assert plugin in plugin_names, (
+                        f"Required plugin '{plugin}' not installed"
+                    )
         except requests.exceptions.ConnectionError:
             pytest.skip("Jenkins plugin manager not available")
 
@@ -111,6 +111,6 @@ class TestUfawkesPipeAcceptance:
             "Failed to start",
         ]
         for error in critical_errors:
-            assert (
-                error not in result.stdout
-            ), f"Jenkins log contains critical error: {error}"
+            assert error not in result.stdout, (
+                f"Jenkins log contains critical error: {error}"
+            )
