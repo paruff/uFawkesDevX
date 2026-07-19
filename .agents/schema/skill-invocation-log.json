@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "session_id",
+    "agent",
+    "triggered_by",
+    "started_at",
+    "timestamp",
+    "duration_ms",
+    "root_cause_category",
+    "findings"
+  ],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "Unique identifier for this invocation"
+    },
+    "agent": { "type": "string", "description": "Agent name" },
+    "triggered_by": {
+      "type": "string",
+      "description": "What triggered this flow"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when agent began"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when log was written"
+    },
+    "duration_ms": {
+      "type": "integer",
+      "description": "Duration in milliseconds"
+    },
+    "root_cause_category": {
+      "type": "string",
+      "description": "Root cause category matching ci-fix-report"
+    },
+    "originating_session_id": {
+      "type": "string",
+      "description": "Session ID of the feature-flow that produced the broken code"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severity", "description"],
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": ["blocker", "defect", "note"]
+          },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "decision": { "type": "string", "description": "The key decision made" },
+    "blockers": {
+      "type": "string",
+      "description": "What blocked completion, if any"
+    }
+  }
+}

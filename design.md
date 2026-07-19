@@ -489,47 +489,47 @@ writing. Only Python and JavaScript-node tag formats were confirmed in search re
 .PHONY: network build up down check-gid logs-coder logs-backstage test help
 
 network: ## Create fawkes-net if it does not exist
- docker network create fawkes-net || true
+  docker network create fawkes-net || true
 
 check-gid: ## Print the host docker group GID — set this as DOCKER_GID in .env
- @getent group docker | cut -d: -f3
+  @getent group docker | cut -d: -f3
 
 build: ## Build all custom service images
- docker compose build
+  docker compose build
 
 up: network ## Start uFawkesDevX stack (requires uFawkesRes running)
- docker compose up -d
- @echo ""
- @echo "  Coder:          http://localhost:7080  (use CODER_ACCESS_URL for workspaces)"
- @echo "  Backstage:      http://localhost:7007"
- @echo "  Gateway:        http://localhost:8000"
- @echo "  Score API:      http://localhost:8081"
- @echo "  Plugin Manager: http://localhost:8083"
+  docker compose up -d
+  @echo ""
+  @echo "  Coder:          http://localhost:7080  (use CODER_ACCESS_URL for workspaces)"
+  @echo "  Backstage:      http://localhost:7007"
+  @echo "  Gateway:        http://localhost:8000"
+  @echo "  Score API:      http://localhost:8081"
+  @echo "  Plugin Manager: http://localhost:8083"
 
 down: ## Stop stack
- docker compose down
+  docker compose down
 
 logs-coder: ## Tail Coder logs
- docker compose logs -f coder
+  docker compose logs -f coder
 
 logs-backstage: ## Tail Backstage logs
- docker compose logs -f backstage
+  docker compose logs -f backstage
 
 test: ## Run contract tests
- pytest tests/unit/ -v
+  pytest tests/unit/ -v
 
 pre-commit-setup: ## Install pre-commit hooks
- pip install pre-commit && pre-commit install
+  pip install pre-commit && pre-commit install
 
 pre-commit-run: ## Run pre-commit on all files
- pre-commit run --all-files
+  pre-commit run --all-files
 
 coder-push-template: ## Push the devcontainer workspace template to Coder (requires Coder running)
- cd coder/templates/devcontainer-docker && coder templates push devcontainer-docker
+  cd coder/templates/devcontainer-docker && coder templates push devcontainer-docker
 
 help:
- @grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
-   awk 'BEGIN {FS = ":.*?## "}; {printf "  %-25s %s\n", $$1, $$2}'
+  @grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+    awk 'BEGIN {FS = ":.*?## "}; {printf "  %-25s %s\n", $$1, $$2}'
 ```
 
 ---

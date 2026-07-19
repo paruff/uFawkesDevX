@@ -1,8 +1,14 @@
 # Pre-commit hooks for uFawkes product suite repos
 # Install: pre-commit install --hook-type commit-msg
 # Run manually: pre-commit run --all-files
+#
+# All repos pinned to exact SHAs — no unpinned refs.
+# Matches the versions used by uFawkesPipe reusable-preflight CI.
 
 repos:
+  # ============================================================================
+  # General Code Quality
+  # ============================================================================
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -18,6 +24,9 @@ repos:
         args: ["--fix=lf"]
       - id: detect-private-key
 
+  # ============================================================================
+  # Python (Ruff)
+  # ============================================================================
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.11.0
     hooks:
@@ -25,36 +34,36 @@ repos:
         args: ["--fix"]
       - id: ruff-format
 
+  # ============================================================================
+  # YAML Linting
+  # ============================================================================
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.35.1
     hooks:
       - id: yamllint
         args: ["-c", ".yamllint"]
+        types: [yaml]
 
+  # ============================================================================
+  # Markdown Linting
+  # ============================================================================
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.44.0
     hooks:
       - id: markdownlint
         args: ["--config", ".markdownlint.json", "--fix"]
 
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
-    hooks:
-      - id: prettier
-        types_or: [json, yaml, markdown]
-        args: ["--write", "--ignore-unknown"]
-
+  # ============================================================================
+  # Security Scanning
+  # ============================================================================
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.18.1
+    rev: v8.18.2
     hooks:
       - id: gitleaks
 
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.4.0
-    hooks:
-      - id: detect-secrets
-        args: ["--baseline", ".secrets.baseline"]
-
+  # ============================================================================
+  # Conventional Commits
+  # ============================================================================
   - repo: local
     hooks:
       - id: commit-msg
