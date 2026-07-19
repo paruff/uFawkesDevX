@@ -1,18 +1,45 @@
-# CI Diagnosis
+# CI Diagnosis — PR #20 (feat/devx-ci-pipeline)
 
-**Failure:** CI Pipeline (`ci-pipeline.yml`) — Startup Failure
-**Location:** `.github/workflows/ci-pipeline.yml` line 57-59
-**Evidence:**
+## Failure Summary
 
-- Workflow consistently fails with `startup_failure` across all branches (main, feat/devx-ci-pipeline, dependabot branches)
-- Error from GitHub Actions: _".github/workflows/ci-pipeline.yml (Line: 57, Col: 32): Invalid input, validate-docker-compose is not defined in the referenced workflow. .github/workflows/ci-pipeline.yml (Line: 58, Col: 23): Invalid input, validate-jcasc is not defined in the referenced workflow."_
-- The `build` job passes `validate-docker-compose`, `validate-jcasc`, `validate-k8s` inputs to `reusable-build.yml`, but `reusable-build.yml` does not define those inputs
-- CI (`ci.yml`) succeeds because it doesn't use the broken workflow
-- PR #16 (dependabot: `actions/checkout@v6` → `v7`) was merged to `main` but not applied to this branch
-- Current branch still has 19 occurrences of `actions/checkout@v6`
+| Failure                                         | Location                            | Type     |
+| ----------------------------------------------- | ----------------------------------- | -------- |
+| Merge conflicts blocking PR merge               | 7 workflow files                    | Pipeline |
+| CI Pipeline `startup_failure` (run 27498587758) | `.github/workflows/ci-pipeline.yml` | Pipeline |
 
-**Likely Cause:** `ci-pipeline.yml` references input parameters (`validate-docker-compose`, `validate-jcasc`, `validate-k8s`) that are not defined in the called workflow `reusable-build.yml`, causing GitHub Actions to reject the workflow at parse time.
+## Root Cause Analysis
+
+### Root Cause 1: Modify/Delete Merge Conflicts (Pipeline — BLOCKER)
+
+**Evidence:** 7 files deleted in `feat/devx-ci-pipeline` were modified on `main`:
+`.github/workflows/ci-tests.yml`, `.github/workflows/reusable-build.yml`,
+`.github/workflows/reusable-dependency-review.yml`,
+`.github/workflows/reusable-lint.yml`,
+`.github/workflows/reusable-preflight.yml`,
+`.github/workflows/reusable-security-scanning.yml`,
+`.github/workflows/reusable-tests.yml`
+
+**Likely Cause:** `feat/devx-ci-pipeline` migrated to uFawkesPipe remote reusable
+workflows and deleted local copies. `main` subsequently received updates to these
+files (via PR #21 or other changes), creating modify/delete conflicts.
 
 **Confidence:** HIGH
 
-**Proposed Fix:** Remove the three undefined inputs from the `build` job call in `ci-pipeline.yml`, and apply the `actions/checkout@v7` upgrade from PR #16.
+**Fix:** Accept deletions — uFawkesPipe provides these workflows at
+`paruff/ufawkespipe/.github/workflows/reusable-*.yml@v1.1.0`.
+Configure ci-pipeline.yml inputs to match uFawkesDevX architecture:
+disable fail-on-latest (compose file uses `docker-compose.yml` naming),
+disable coverage gate (targets uFawkesPipe internal packages),
+run unit test tier only.
+
+### Root Cause 2: CI Pipeline startup_failure (Pipeline — PREVIOUSLY FIXED)
+
+**Evidence:** Run 27498587758 on commit `edb1495` — workflow validation failed.
+**Likely Cause:** Original `ci-pipeline.yml` passed undefined inputs
+(`validate-docker-compose`, `validate-jcasc`, `validate-k8s`) to
+`reusable-build.yml`.
+
+**Confidence:** HIGH
+
+**Fix:** Already resolved in subsequent commits (`dee568a`, `691121d`)
+by removing invalid inputs and migrating to uFawkesPipe remote workflows.
