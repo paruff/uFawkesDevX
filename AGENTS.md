@@ -38,6 +38,7 @@ It provides Backstage, Score service, Eclipse Che, Plugin Manager, and the gatew
 ## §4 Architecture Rules
 
 ### Compose Rules
+
 - No `:latest` tags in `compose.yaml` (CI gate enforces this).
 - Services must declare healthchecks.
 - Named volumes for persistent data.
@@ -45,6 +46,7 @@ It provides Backstage, Score service, Eclipse Che, Plugin Manager, and the gatew
 - `.env` is gitignored; `.env.example` is the source of truth.
 
 ### Scripts Rules
+
 - Shell scripts in `scripts/` pass `shellcheck` and `shfmt`.
 - Pre-commit config is the local gate; CI runs the same checks.
 - All scripts are idempotent.
@@ -52,6 +54,7 @@ It provides Backstage, Score service, Eclipse Che, Plugin Manager, and the gatew
 ## §5 PM-Agent Contract
 
 ### May Do
+
 - Create branches prefixed with `feat/`, `fix/`, `chore/`, `docs/`.
 - Edit workflow files to add DORA observability timestamps.
 - Create/edit `AGENTS.md`, `docs/PR_STANDARD.md`.
@@ -59,12 +62,14 @@ It provides Backstage, Score service, Eclipse Che, Plugin Manager, and the gatew
 - Propose architecture changes via spec/design/tasks workflow.
 
 ### Must Ask
+
 - Before modifying `compose.yaml` service structure.
 - Before changing database schema or seed data.
 - Before pushing to `main` (all work goes through PRs).
 - Before modifying CI/CD pipeline structure (stages, gates).
 
 ### Must Never
+
 1. Use `:latest` tags in `compose.yaml`.
 2. Commit `.env` files or real secrets.
 3. Bypass CI gates without documented emergency procedure.
@@ -92,6 +97,7 @@ Before merging any AI-assisted PR:
 ## §8 GitOps / Trunk-Based Delivery Contract
 
 ### Branch & PR Discipline
+
 - All work on feature branches off `main` (trunk-based, short-lived).
 - Branch naming: `feat/<slug>`, `fix/<slug>`, `chore/<slug>`, `docs/<slug>`.
 - Every branch opens a PR through CI gates before merge.
@@ -99,6 +105,7 @@ Before merging any AI-assisted PR:
 - Squash-merge to `main` with a clean commit message.
 
 ### Deployment Lifecycle Gates
+
 - `main-ci-guard.yml` enforces CI pass before merge.
 - Every job emits `job-start` / `job-finish` timestamps for DORA observability.
 - Pipeline result logged as `pipeline-result: success|failure`.
