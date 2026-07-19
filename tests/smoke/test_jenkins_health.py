@@ -65,9 +65,9 @@ class TestJenkinsSmoke:
             "StackOverflowError",
         ]
         for error in critical_errors:
-            assert (
-                error not in result.stdout
-            ), f"Jenkins log contains critical error: {error}"
+            assert error not in result.stdout, (
+                f"Jenkins log contains critical error: {error}"
+            )
 
     def test_jenkins_plugin_manager_accessible(self):
         """Jenkins plugin manager should be accessible."""
