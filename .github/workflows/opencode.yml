@@ -1,0 +1,223 @@
+# OpenCode AI assistant workflow
+# Triggered by issue/PR comments containing `/opencode` or `/oc`
+# Provider chain: NVIDIA NIM → Google Gemini → OpenCode Zen
+
+name: OpenCode AI
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  opencode:
+    # Only run when the comment starts with /opencode or /oc
+    if: |
+      (startsWith(github.event.comment.body, '/opencode') ||
+       startsWith(github.event.comment.body, '/oc')) &&
+      github.event.comment.author_association != 'NONE'
+    name: OpenCode AI
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: DORA job start
+        run: |
+          echo "job-start:$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "sha:${{ github.sha }}"
+          echo "workflow:${{ github.workflow }}"
+          echo "job:${{ github.job }}"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ----------------------------------------------------------------
+      # nim-proxy: rate-limit / load-balance NVIDIA NIM requests
+      # Listens on localhost:8000, forwards to api.nim.nvidia.com
+      # If proxy fails to start we fall back to direct provider URLs
+      # ----------------------------------------------------------------
+      - name: Start nim-proxy (NVIDIA rate-limit proxy)
+        id: nim_proxy
+        continue-on-error: true
+        env:
+          # Single key or comma-separated list for multiple keys
+          NVIDIA_API_KEYS: ${{ secrets.NVIDIA_API_KEYS || secrets.NVIDIA_API_KEY }}
+        run: |
+          if [ -z "${NVIDIA_API_KEYS}" ]; then
+            echo "NVIDIA_API_KEY(S) not set — skipping proxy"
+            echo "started=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Write keys one-per-line for the proxy
+          echo "${NVIDIA_API_KEYS}" | tr ',' '\n' > /tmp/nim_keys.txt
+
+          docker run -d \
+            --name nim-proxy \
+            --network host \
+            -e NIM_API_KEYS="$(cat /tmp/nim_keys.txt | tr '\n' ',')" \
+            -e LISTEN_PORT=8000 \
+            -e UPSTREAM_URL=https://integrate.api.nvidia.com/v1 \
+            -e RATE_LIMIT_RPM=40 \
+            ghcr.io/nim-proxy/nim-proxy:0.2.0 2>/dev/null || \
+          docker run -d \
+            --name nim-proxy \
+            --network host \
+            -p 8000:8000 \
+            -e NVIDIA_API_KEY="${NVIDIA_API_KEYS%%,*}" \
+            nginxproxy/nginx-proxy:1.6.4 2>/dev/null || true
+
+          # Wait up to 15 s for the proxy to become ready
+          for i in $(seq 1 15); do
+            if curl -sf http://localhost:8000/health > /dev/null 2>&1 || \
+               curl -sf http://localhost:8000/v1/models > /dev/null 2>&1; then
+              echo "nim-proxy ready"
+              echo "started=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "nim-proxy did not become ready — will use fallback"
+          docker logs nim-proxy 2>/dev/null || true
+          echo "started=false" >> "$GITHUB_OUTPUT"
+
+      # ----------------------------------------------------------------
+      # Build opencode.json at runtime so model routing is dynamic
+      # ----------------------------------------------------------------
+      - name: Write opencode.json
+        env:
+          NIM_PROXY_STARTED: ${{ steps.nim_proxy.outputs.started }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+        run: |
+          # Pick NVIDIA base URL: proxy when available, direct otherwise
+          if [ "${NIM_PROXY_STARTED}" = "true" ]; then
+            NIM_BASE_URL="http://localhost:8000/v1"
+            NIM_API_KEY="proxy"          # proxy handles auth
+          else
+            NIM_BASE_URL="https://integrate.api.nvidia.com/v1"
+            NIM_API_KEY="${NVIDIA_API_KEY}"
+          fi
+
+          cat > opencode.json <<EOF
+          {
+            "$schema": "https://opencode.ai/config.schema.json",
+            "providers": {
+              "nvidia-nim": {
+                "name": "NVIDIA NIM",
+                "apiKey": "${NIM_API_KEY}",
+                "baseURL": "${NIM_BASE_URL}",
+                "models": [
+                  "nvidia/qwen3-coder-480b-a35b-instruct",
+                  "nvidia/nemotron-3-ultra-550b-a55b"
+                ]
+              },
+              "google": {
+                "name": "Google Gemini",
+                "apiKey": "${GEMINI_API_KEY}",
+                "models": [
+                  "google/gemini-2.5-flash",
+                  "google/gemini-2.5-pro"
+                ]
+              },
+              "opencode-zen": {
+                "name": "OpenCode Zen",
+                "apiKey": "${OPENCODE_API_KEY}",
+                "baseURL": "https://api.opencode.ai/v1",
+                "models": [
+                  "opencode-zen/deepseek-v4-flash-free",
+                  "opencode-zen/mimo-v2.5-free"
+                ]
+              }
+            },
+            "model": "nvidia/qwen3-coder-480b-a35b-instruct",
+            "fallback": [
+              "nvidia/nemotron-3-ultra-550b-a55b",
+              "google/gemini-2.5-flash",
+              "google/gemini-2.5-pro",
+              "opencode-zen/deepseek-v4-flash-free",
+              "opencode-zen/mimo-v2.5-free"
+            ]
+          }
+          EOF
+
+      # ----------------------------------------------------------------
+      # Install OpenCode CLI
+      # ----------------------------------------------------------------
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install.sh | bash
+          echo "${HOME}/.local/bin" >> "$GITHUB_PATH"
+
+      # ----------------------------------------------------------------
+      # Optional: install agent skills
+      # ----------------------------------------------------------------
+      - name: Install agent skills
+        continue-on-error: true
+        run: |
+          if command -v opencode > /dev/null 2>&1; then
+            opencode skills install github 2>/dev/null || true
+            opencode skills install filesystem 2>/dev/null || true
+          fi
+
+      # ----------------------------------------------------------------
+      # Run OpenCode with the prompt from the comment
+      # ----------------------------------------------------------------
+      - name: Run OpenCode
+        id: run_opencode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          OPENCODE_CONFIG: ${{ github.workspace }}/opencode.json
+        run: |
+          # Strip the trigger prefix to get the actual prompt
+          COMMENT="${{ github.event.comment.body }}"
+          PROMPT="${COMMENT#/opencode}"
+          PROMPT="${PROMPT#/oc}"
+          PROMPT="$(echo "${PROMPT}" | sed 's/^[[:space:]]*//')"
+
+          if [ -z "${PROMPT}" ]; then
+            PROMPT="Please review the current state of this issue and suggest next steps."
+          fi
+
+          echo "Prompt: ${PROMPT}"
+          opencode run --config opencode.json "${PROMPT}" 2>&1 | tee /tmp/opencode-output.txt
+
+      # ----------------------------------------------------------------
+      # Post OpenCode response as a comment
+      # ----------------------------------------------------------------
+      - name: Post response comment
+        if: always() && steps.run_opencode.outcome != 'skipped'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body;
+            try {
+              const output = fs.readFileSync('/tmp/opencode-output.txt', 'utf8').trim();
+              body = output.length > 0
+                ? `**OpenCode AI response:**\n\n${output}`
+                : '⚠️ OpenCode produced no output.';
+            } catch {
+              body = '⚠️ OpenCode output file not found.';
+            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body.slice(0, 65000), // GitHub comment limit
+            });
+
+      - name: DORA job finish
+        if: always()
+        run: echo "job-finish:$(date -u +%Y-%m-%dT%H:%M:%SZ)"

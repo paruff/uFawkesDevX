@@ -1,0 +1,46 @@
+{
+  "plugin": "opencode-model-fallback",
+  "version": "1",
+
+  "chain": [
+    {
+      "provider": "nvidia-nim",
+      "model": "nvidia/qwen3-coder-480b-a35b-instruct",
+      "baseURL": "http://localhost:8000/v1",
+      "rateLimitRPM": 40,
+      "note": "Primary: NVIDIA Qwen3-Coder via nim-proxy (rate-limited to 40 RPM)"
+    },
+    {
+      "provider": "nvidia-nim",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "baseURL": "http://localhost:8000/v1",
+      "rateLimitRPM": 40,
+      "note": "Secondary NVIDIA model; still routed through nim-proxy"
+    },
+    {
+      "provider": "google",
+      "model": "google/gemini-2.5-flash",
+      "note": "First Google fallback — fast and free-tier friendly"
+    },
+    {
+      "provider": "google",
+      "model": "google/gemini-2.5-pro",
+      "note": "Second Google fallback — higher capacity"
+    },
+    {
+      "provider": "opencode-zen",
+      "model": "opencode-zen/deepseek-v4-flash-free",
+      "baseURL": "https://api.opencode.ai/v1",
+      "note": "Last-resort free model via OpenCode Zen"
+    },
+    {
+      "provider": "opencode-zen",
+      "model": "opencode-zen/mimo-v2.5-free",
+      "baseURL": "https://api.opencode.ai/v1",
+      "note": "Final fallback free model via OpenCode Zen"
+    }
+  ],
+
+  "retryOnErrors": ["rate_limit", "timeout", "server_error"],
+  "maxRetriesPerModel": 2
+}
