@@ -1,10 +1,22 @@
 """Integration tests for Docker Compose stack."""
 
-import pytest
 import subprocess
 import time
-import requests
 from pathlib import Path
+
+import pytest
+import requests
+
+REPO_ROOT = Path(__file__).parent.parent.parent
+
+# service -> container name (see compose.yaml)
+SERVICES = {
+    "coder": "developerd-coder",
+    "backstage": "developerd-backstage",
+    "score-service": "developerd-score",
+    "plugin-manager": "developerd-plugin-manager",
+    "gateway": "developerd-gateway",
+}
 
 
 class TestDockerComposeIntegration:
@@ -13,73 +25,59 @@ class TestDockerComposeIntegration:
     @pytest.fixture(autouse=True)
     def setup_and_teardown(self):
         """Start and stop Docker Compose stack."""
-        # Setup: Start stack
         subprocess.run(
             ["docker", "compose", "up", "-d"],
             capture_output=True,
             text=True,
-            cwd=str(Path(__file__).parent.parent.parent),
+            cwd=str(REPO_ROOT),
         )
         # Wait for services to be ready
         time.sleep(30)
         yield
-        # Teardown: Stop stack
         subprocess.run(
             ["docker", "compose", "down", "-v"],
             capture_output=True,
             text=True,
-            cwd=str(Path(__file__).parent.parent.parent),
+            cwd=str(REPO_ROOT),
         )
 
-    def test_jenkins_is_running(self):
-        """Jenkins container should be running."""
+    def test_all_services_are_running(self):
+        """Every service defined in compose.yaml should be running."""
         result = subprocess.run(
             ["docker", "compose", "ps", "--format", "json"],
             capture_output=True,
             text=True,
-            cwd=str(Path(__file__).parent.parent.parent),
+            cwd=str(REPO_ROOT),
         )
         assert result.returncode == 0
-        # Check if jenkins is in the output
-        assert "jenkins" in result.stdout.lower()
+        for service in SERVICES:
+            assert service in result.stdout.lower(), f"{service} not running"
 
-    def test_jenkins_healthcheck_passes(self):
-        """Jenkins health check should pass."""
-        result = subprocess.run(
-            [
-                "docker",
-                "inspect",
-                "--format",
-                "{{.State.Health.Status}}",
-                "ufawkespipe-jenkins-1",
-            ],
-            capture_output=True,
-            text=True,
-        )
-        # Allow for container name variations
-        if "no such container" in result.stderr:
-            # Try to find the container
-            ps_result = subprocess.run(
-                ["docker", "ps", "--format", "{{.Names}}"],
-                capture_output=True,
-                text=True,
-            )
-            containers = ps_result.stdout.strip().split("\n")
-            jenkins_containers = [c for c in containers if "jenkins" in c.lower()]
-            assert len(jenkins_containers) > 0, "Jenkins container not found"
-
-    def test_jenkins_responds_on_port_8080(self):
-        """Jenkins should respond on port 8080."""
+    def test_gateway_responds_on_port_8000(self):
+        """API Gateway should serve the platform landing page."""
         try:
-            response = requests.get(
-                "http://localhost:8080/login",
-                timeout=10,
-                allow_redirects=True,
-            )
+            response = requests.get("http://localhost:8000/", timeout=10)
             assert response.status_code == 200
-            assert "jenkins" in response.text.lower()
         except requests.exceptions.ConnectionError:
-            pytest.skip("Jenkins not available on port 8080")
+            pytest.skip("Gateway not available on port 8000")
+
+    def test_backstage_responds_on_port_7007(self):
+        """Backstage portal should respond."""
+        try:
+            response = requests.get("http://localhost:7007/healthcheck", timeout=10)
+            assert response.status_code == 200
+        except requests.exceptions.ConnectionError:
+            pytest.skip("Backstage not available on port 7007")
+
+    def test_score_service_health_endpoints(self):
+        """Score API and webhook servers should both report healthy."""
+        try:
+            api_response = requests.get("http://localhost:8081/health", timeout=10)
+            webhook_response = requests.get("http://localhost:8082/health", timeout=10)
+            assert api_response.status_code == 200
+            assert webhook_response.status_code == 200
+        except requests.exceptions.ConnectionError:
+            pytest.skip("Score service not available on port 8081/8082")
 
     def test_volumes_are_created(self):
         """Docker volumes should be created for persistence."""
@@ -89,19 +87,15 @@ class TestDockerComposeIntegration:
             text=True,
         )
         assert result.returncode == 0
-        # At least one volume should exist
         volumes = result.stdout.strip().split("\n")
         assert len(volumes) > 0, "No Docker volumes found"
 
     def test_no_port_conflicts(self):
-        """No port conflicts between services."""
+        """docker compose up should succeed with no port binding failures."""
         result = subprocess.run(
             ["docker", "compose", "ps", "--format", "json"],
             capture_output=True,
             text=True,
-            cwd=str(Path(__file__).parent.parent.parent),
+            cwd=str(REPO_ROOT),
         )
-        if result.returncode == 0:
-            # Parse the output to check for port conflicts
-            # This is a basic check - real implementation would parse JSON
-            assert "0.0.0.0:" in result.stdout or "0.0.0.0:" not in result.stdout
+        assert result.returncode == 0

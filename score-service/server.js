@@ -7,6 +7,10 @@ const Ajv = require('ajv');
 const YAML = require('yaml');
 const fs = require('fs').promises;
 const path = require('path');
+const { execFile } = require('child_process');
+const { promisify } = require('util');
+
+const execFileAsync = promisify(execFile);
 
 // Initialize Express apps for API and Webhooks
 const apiApp = express();
@@ -26,6 +30,12 @@ const API_PORT = process.env.API_PORT || 8081;
 const WEBHOOK_PORT = process.env.WEBHOOK_PORT || 8082;
 const SPECS_DIR = process.env.SPECS_DIR || '/app/specs';
 const PLUGINS_DIR = process.env.PLUGINS_DIR || '/app/plugins';
+// TODO: uFawkesPipe's docs/webhook-api.md does not document an endpoint for
+// external planes to trigger a new pipeline run (only GitHub-originated
+// webhooks and an authenticated read-oriented REST API are documented).
+// PIPELINE_WEBHOOK_URL and this payload shape are provisional until that's
+// confirmed upstream.
+const PIPELINE_WEBHOOK_URL = process.env.PIPELINE_WEBHOOK_URL || '';
 
 // Database connection
 const pool = new Pool({
@@ -138,6 +148,58 @@ async function initDatabase() {
   }
 }
 
+// score-compose integration (DX-003)
+
+// Generates a docker-compose manifest from a Score spec via the score-compose
+// CLI. Runs in an isolated per-workload directory since `score-compose init`
+// writes state (.score-compose/) into its cwd.
+async function generateComposeFromSpec(name, specPath) {
+  const projectDir = path.join(SPECS_DIR, '.compose-projects', name);
+  await fs.mkdir(projectDir, { recursive: true });
+
+  const scoreComposeStateDir = path.join(projectDir, '.score-compose');
+  const alreadyInitialized = await fs
+    .access(scoreComposeStateDir)
+    .then(() => true)
+    .catch(() => false);
+
+  if (!alreadyInitialized) {
+    await execFileAsync('score-compose', ['init', '--no-sample', '-p', name], {
+      cwd: projectDir,
+    });
+  }
+
+  const outputPath = path.join(projectDir, 'compose.yaml');
+  await execFileAsync('score-compose', ['generate', specPath, '-o', outputPath], {
+    cwd: projectDir,
+  });
+
+  return { outputPath, compose: await fs.readFile(outputPath, 'utf8') };
+}
+
+// Notifies uFawkesPipe that a workload's spec changed, so it can pick up a
+// new pipeline run. Never throws — a failed/unreachable webhook must not
+// block spec creation (AC2: non-blocking, log-and-continue).
+async function triggerPipelineWebhook(workload, action, metadata) {
+  if (!PIPELINE_WEBHOOK_URL) {
+    console.warn('PIPELINE_WEBHOOK_URL not configured; skipping pipeline webhook trigger');
+    return;
+  }
+
+  try {
+    const response = await fetch(PIPELINE_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workload, action, metadata, timestamp: new Date().toISOString() }),
+    });
+    if (!response.ok) {
+      console.warn(`Pipeline webhook responded with status ${response.status}`);
+    }
+  } catch (error) {
+    console.warn('Pipeline webhook unreachable:', error.message);
+  }
+}
+
 // REST API Routes
 
 // Health check
@@ -228,7 +290,21 @@ apiApp.post('/api/v1/specs', async (req, res) => {
     const specPath = path.join(SPECS_DIR, `${name}.yaml`);
     await fs.writeFile(specPath, YAML.stringify(spec));
 
-    res.status(201).json(result.rows[0]);
+    // Generate docker-compose manifest via score-compose (best-effort: a
+    // missing/failing CLI must not block spec creation, which already
+    // succeeded above).
+    let composeGenerated = false;
+    try {
+      await generateComposeFromSpec(name, specPath);
+      composeGenerated = true;
+    } catch (error) {
+      console.error(`score-compose generate failed for ${name}:`, error.message);
+    }
+
+    // Notify uFawkesPipe (fire-and-forget; never blocks the response)
+    triggerPipelineWebhook(name, 'spec-updated', { version: result.rows[0].version });
+
+    res.status(201).json({ ...result.rows[0], composeGenerated });
   } catch (error) {
     console.error('Error creating spec:', error);
     res.status(500).json({ error: 'Failed to create spec' });
@@ -428,4 +504,8 @@ async function start() {
   }
 }
 
-start();
+if (require.main === module) {
+  start();
+}
+
+module.exports = { generateComposeFromSpec, triggerPipelineWebhook };
