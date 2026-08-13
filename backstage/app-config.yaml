@@ -21,7 +21,11 @@ backend:
       host: ${POSTGRES_HOST}
       port: ${POSTGRES_PORT}
       user: ${POSTGRES_USER}
-      password: ${POSTGRES_PASSWORD}
+      # DX-002: password comes from the backstage_db_password Docker secret,
+      # not a plain env var. Backstage's config loader supports $file to
+      # read a value from a file at load time.
+      password:
+        $file: /run/secrets/backstage_db_password
       database: ${POSTGRES_DB}
 
 # Local authentication configuration
@@ -34,9 +38,6 @@ integrations:
   # Integration with Score service
   score:
     host: http://score-service:8081
-  # Integration with Eclipse Che
-  che:
-    host: http://che:8080
 
 catalog:
   import:
@@ -64,10 +65,6 @@ plugins:
     enabled: true
     apiEndpoint: http://score-service:8081
     webhookEndpoint: http://score-service:8082
-  # Che integration plugin
-  che:
-    enabled: true
-    endpoint: http://che:8080
   # Custom plugin loader
   custom:
     pluginDir: /app/plugins
@@ -80,11 +77,6 @@ proxy:
     changeOrigin: true
     pathRewrite:
       "^/score-api": "/"
-  "/che-api":
-    target: "http://che:8080"
-    changeOrigin: true
-    pathRewrite:
-      "^/che-api": "/"
   "/plugin-manager":
     target: "http://plugin-manager:8083"
     changeOrigin: true

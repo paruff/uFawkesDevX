@@ -1,4 +1,4 @@
-.PHONY: help start stop restart logs build clean health status install test test-unit test-integration test-smoke test-acceptance validate pre-commit-setup pre-commit-run
+.PHONY: help start stop restart logs build clean health status install test test-unit test-integration test-smoke test-acceptance validate pre-commit-setup pre-commit-run network check-gid up down
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -12,35 +12,43 @@ install: ## Install and setup the platform
 	@echo "Configuration file created. Edit .env if needed."
 	@echo "Run 'make start' to start the platform"
 
-start: ## Start all services
+network: ## Create the external fawkes-net Docker network (shared with uFawkesRes/uFawkesSec)
+	docker network inspect fawkes-net >/dev/null 2>&1 || docker network create fawkes-net
+
+check-gid: ## Print the host docker.sock group GID for DOCKER_GID in .env
+	@stat -c '%g' /var/run/docker.sock 2>/dev/null || stat -f '%g' /var/run/docker.sock
+
+start: network ## Start all services
 	@echo "Starting Developer Control Plane..."
-	docker-compose up -d
+	docker compose up -d
 	@echo "Services starting... Use 'make status' to check progress"
 	@echo "Access the platform at http://localhost:8000"
 
+up: start ## Alias for 'start' (matches compose.yaml usage docs)
+
 stop: ## Stop all services
 	@echo "Stopping Developer Control Plane..."
-	docker-compose stop
+	docker compose stop
 
 restart: ## Restart all services
 	@echo "Restarting Developer Control Plane..."
-	docker-compose restart
+	docker compose restart
 
 logs: ## Show logs from all services
-	docker-compose logs -f
+	docker compose logs -f
 
 logs-%: ## Show logs from specific service (e.g., make logs-score-service)
-	docker-compose logs -f $*
+	docker compose logs -f $*
 
 build: ## Build all custom services
 	@echo "Building services..."
-	docker-compose build
+	docker compose build
 
 build-%: ## Build specific service (e.g., make build-score-service)
-	docker-compose build $*
+	docker compose build $*
 
 status: ## Show status of all services
-	docker-compose ps
+	docker compose ps
 
 health: ## Check health of all services
 	@echo "Checking service health..."
@@ -51,22 +59,21 @@ health: ## Check health of all services
 
 clean: ## Stop services and remove containers (keeps volumes)
 	@echo "Cleaning up containers..."
-	docker-compose down
+	docker compose down
+
+down: clean ## Alias for 'clean' (matches compose.yaml usage docs)
 
 clean-all: ## Stop services and remove everything including volumes (WARNING: deletes data)
 	@echo "WARNING: This will delete all data!"
 	@read -p "Are you sure? [y/N] " -n 1 -r; \
 	echo; \
 	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		docker-compose down -v; \
+		docker compose down -v; \
 		echo "All data removed"; \
 	fi
 
 shell-%: ## Open shell in service container (e.g., make shell-score-service)
-	docker-compose exec $* sh
-
-db-shell: ## Open PostgreSQL shell
-	docker-compose exec postgres psql -U $${POSTGRES_USER:-backstage} -d $${POSTGRES_DB:-backstage}
+	docker compose exec $* sh
 
 api-test: ## Test Score API endpoints
 	@echo "Testing Score API..."
