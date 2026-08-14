@@ -1,0 +1,25 @@
+app:
+  name: "{{ cookiecutter.project_slug }}"
+  language: node
+
+build:
+  builder: cnb
+  cnb:
+    builder: paketobuildpacks/builder-jammy-base
+
+image:
+  registry: ghcr.io
+  namespace: "{{ cookiecutter.registry_namespace }}"
+  name: "{{ cookiecutter.project_slug }}"
+
+stages:
+  lint:
+    enabled: true
+    commands:
+      - language: node
+        cmd: npx eslint .
+  test:
+    enabled: true
+    commands:
+      - language: node
+        cmd: npm test

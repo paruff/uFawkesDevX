@@ -1,0 +1,6 @@
+{
+  "project_name": "My Express App",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
+  "language": "node",
+  "registry_namespace": "myorg"
+}

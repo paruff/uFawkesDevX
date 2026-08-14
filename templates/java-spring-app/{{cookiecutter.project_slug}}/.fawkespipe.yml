@@ -1,0 +1,25 @@
+app:
+  name: "{{ cookiecutter.project_slug }}"
+  language: java
+
+build:
+  builder: cnb
+  cnb:
+    builder: paketobuildpacks/builder-jammy-base
+
+image:
+  registry: ghcr.io
+  namespace: "{{ cookiecutter.registry_namespace }}"
+  name: "{{ cookiecutter.project_slug }}"
+
+stages:
+  lint:
+    enabled: true
+    commands:
+      - language: java
+        cmd: mvn -q verify -DskipTests
+  test:
+    enabled: true
+    commands:
+      - language: java
+        cmd: mvn -q test
