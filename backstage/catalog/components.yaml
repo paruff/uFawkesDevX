@@ -19,23 +19,6 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: eclipse-che
-  title: Eclipse Che
-  description: Cloud development environments
-  annotations:
-    backstage.io/techdocs-ref: dir:.
-spec:
-  type: service
-  lifecycle: production
-  owner: platform-team
-  system: developer-control-plane
-  providesApis:
-    - che-api
-
----
-apiVersion: backstage.io/v1alpha1
-kind: Component
-metadata:
   name: plugin-manager
   title: Plugin Manager
   description: Manages platform extensions and plugins
@@ -76,19 +59,6 @@ metadata:
   description: Webhook endpoints for Score events
 spec:
   type: webhook
-  lifecycle: production
-  owner: platform-team
-  system: developer-control-plane
-
----
-apiVersion: backstage.io/v1alpha1
-kind: API
-metadata:
-  name: che-api
-  title: Eclipse Che API
-  description: API for managing cloud development environments
-spec:
-  type: openapi
   lifecycle: production
   owner: platform-team
   system: developer-control-plane

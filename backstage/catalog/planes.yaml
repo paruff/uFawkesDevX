@@ -1,0 +1,70 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ufawkes-devx
+  title: uFawkesDevX
+  description: DevX plane — Backstage, Coder, Score service, Plugin Manager, Gateway
+  links:
+    - url: https://github.com/paruff/uFawkesDevX
+      title: GitHub Repository
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: developer-control-plane
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: ufawkes-pipe
+  title: uFawkesPipe
+  description: CI/CD plane (Woodpecker CI)
+  links:
+    - url: https://github.com/paruff/uFawkesPipe
+      title: GitHub Repository
+spec:
+  owner: platform-team
+  domain: platform
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: ufawkes-sec
+  title: uFawkesSec
+  description: Security plane
+  links:
+    - url: https://github.com/paruff/ufawkessec
+      title: GitHub Repository
+spec:
+  owner: platform-team
+  domain: platform
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: ufawkes-res
+  title: uFawkesRes
+  description: Shared resource plane (Postgres, Valkey)
+  links:
+    - url: https://github.com/paruff/uFawkesRes
+      title: GitHub Repository
+spec:
+  owner: platform-team
+  domain: platform
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: ufawkes-obs
+  title: uFawkesObs
+  description: Observability plane
+  links:
+    - url: https://github.com/paruff/uFawkesObs
+      title: GitHub Repository
+spec:
+  owner: platform-team
+  domain: platform

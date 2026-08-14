@@ -7,4 +7,5 @@ spec:
   targets:
     - ./components.yaml
     - ./systems.yaml
+    - ./planes.yaml
     - ./templates/score-workload.yaml
