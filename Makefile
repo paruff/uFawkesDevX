@@ -1,4 +1,4 @@
-.PHONY: help start stop restart logs build clean health status install test test-unit test-integration test-smoke test-acceptance validate pre-commit-setup pre-commit-run network check-gid up down
+.PHONY: help start stop restart logs build clean health status install test test-unit test-integration test-smoke test-acceptance validate pre-commit-setup pre-commit-run network check-gid up down coder-push-template
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -122,3 +122,10 @@ pre-commit-setup: ## Install pre-commit hooks
 
 pre-commit-run: ## Run pre-commit hooks on all files
 	pre-commit run --all-files
+
+# ============================================================================
+# Coder Commands
+# ============================================================================
+
+coder-push-template: ## Push the devcontainer workspace template to Coder (requires Coder running)
+	cd coder/templates/devcontainer-docker && coder templates push devcontainer-docker
