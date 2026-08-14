@@ -36,3 +36,16 @@ secrets/
 *.key
 *.crt
 *.pem
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Graphify (generated output)
+graphify-out/
+
+# Local AI tool state
+.claude/
+.serena/
+.headroom/
