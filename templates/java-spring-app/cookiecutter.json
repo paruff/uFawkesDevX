@@ -1,0 +1,6 @@
+{
+  "project_name": "My Spring App",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
+  "language": "java",
+  "registry_namespace": "myorg"
+}

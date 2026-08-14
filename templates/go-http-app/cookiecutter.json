@@ -1,0 +1,6 @@
+{
+  "project_name": "My Go App",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
+  "language": "go",
+  "registry_namespace": "myorg"
+}

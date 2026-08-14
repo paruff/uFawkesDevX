@@ -5,8 +5,17 @@ from pathlib import Path
 
 import pytest
 
-DEVCONTAINER_DIR = Path(__file__).parent.parent.parent / "devcontainer"
+REPO_ROOT = Path(__file__).parent.parent.parent
+DEVCONTAINER_DIR = REPO_ROOT / "devcontainer"
 BASE_DEVCONTAINER_FILES = sorted(DEVCONTAINER_DIR.glob("base-*.json"))
+
+TEMPLATE_TO_BASE = {
+    "python-flask-app": "base-python.json",
+    "java-spring-app": "base-java.json",
+    "node-express-app": "base-node.json",
+    "go-http-app": "base-go.json",
+}
+TEMPLATES_DIR = REPO_ROOT / "templates"
 
 
 class TestBaseDevcontainerFiles:
@@ -63,4 +72,29 @@ class TestBaseDevcontainerFiles:
             config = json.load(f)
         assert config.get("remoteUser") == "vscode", (
             f"{devcontainer_file.name} remoteUser must be 'vscode'"
+        )
+
+
+class TestTemplateDevcontainerFiles:
+    """Validate golden-path template devcontainer.json files (DX-006) stay
+    in sync with the DX-004 base devcontainer definitions."""
+
+    @pytest.mark.parametrize(
+        "template_name, base_name", sorted(TEMPLATE_TO_BASE.items())
+    )
+    def test_template_image_matches_base(self, template_name, base_name):
+        template_file = (
+            TEMPLATES_DIR
+            / template_name
+            / "{{cookiecutter.project_slug}}"
+            / ".devcontainer"
+            / "devcontainer.json"
+        )
+        with open(template_file) as f:
+            template_config = json.load(f)
+        with open(DEVCONTAINER_DIR / base_name) as f:
+            base_config = json.load(f)
+        assert template_config["image"] == base_config["image"], (
+            f"{template_file}: image {template_config['image']!r} does not "
+            f"match {base_name} image {base_config['image']!r}"
         )

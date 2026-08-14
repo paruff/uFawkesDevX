@@ -1,0 +1,13 @@
+apiVersion: score.dev/v1b1
+metadata:
+  name: "{{ cookiecutter.project_slug }}"
+containers:
+  "{{ cookiecutter.project_slug }}":
+    image: .
+    variables:
+      PORT: "8080"
+service:
+  ports:
+    www:
+      port: 8080
+      targetPort: 8080

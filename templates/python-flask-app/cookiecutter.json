@@ -1,0 +1,6 @@
+{
+  "project_name": "My Flask App",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
+  "language": "python",
+  "registry_namespace": "myorg"
+}
