@@ -1,0 +1,157 @@
+# uFawkesDevX compose.yaml — v0.2 (DX-002)
+# Prerequisites:
+#   - uFawkesRes running (postgres:5432 on fawkes-net) [VERIFY exact hostname/port with uFawkesRes]
+#   - Databases created: "coder" and "backstage" in uFawkesRes Postgres
+#   - fawkes-net created: `make network`
+#   - DOCKER_GID set in .env (run: `make check-gid`)
+#   - CODER_ACCESS_URL set to a LAN-reachable address in .env (not localhost)
+# Run: make network && make build && make up
+services:
+  # Coder - Cloud IDE / devcontainer workspace provisioner (replaces Eclipse Che)
+  coder:
+    image: ghcr.io/coder/coder:2.34.3
+    container_name: developerd-coder
+    environment:
+      - CODER_PG_CONNECTION_URL=postgresql://coder:${CODER_DB_PASSWORD}@postgres:5432/coder?sslmode=disable
+      - CODER_HTTP_ADDRESS=0.0.0.0:7080
+      - CODER_ACCESS_URL=${CODER_ACCESS_URL}
+      - CODER_TELEMETRY_ENABLE=false
+    group_add:
+      - "${DOCKER_GID}" # host docker group GID — set via `make check-gid`
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - coder-home:/home/coder/.config
+    ports:
+      - "${CODER_PORT:-7080}:7080"
+    networks:
+      - fawkes-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7080/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  # Backstage - Developer Portal
+  backstage:
+    build:
+      context: ./backstage
+      dockerfile: Dockerfile
+    container_name: developerd-backstage
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - APP_BASE_URL=${APP_BASE_URL:-http://localhost:7007}
+      - BACKEND_BASE_URL=${BACKEND_BASE_URL:-http://localhost:7007}
+      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_USER=${POSTGRES_USER:-backstage}
+      - POSTGRES_DB=${POSTGRES_DB:-backstage}
+      - AUTH_PROVIDER=local
+    secrets:
+      - backstage_db_password
+    volumes:
+      - ./backstage/catalog:/app/catalog:ro
+      - backstage-plugins:/app/plugins
+    ports:
+      - "${BACKSTAGE_PORT:-7007}:7007"
+    networks:
+      - fawkes-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7007/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  # Score Service - Workload Spec Management
+  score-service:
+    build:
+      context: ./score-service
+      dockerfile: Dockerfile
+    container_name: developerd-score
+    ports:
+      - "${SCORE_API_PORT:-8081}:8081"
+      - "${SCORE_WEBHOOK_PORT:-8082}:8082"
+    environment:
+      - API_PORT=8081
+      - WEBHOOK_PORT=8082
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/score
+      - PIPELINE_TRIGGER_ENABLED=${PIPELINE_TRIGGER_ENABLED:-true}
+      - AUTH_PROVIDER=local
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      - score-specs:/app/specs
+      - score-plugins:/app/plugins
+      - ./score-service/config:/app/config:ro
+    networks:
+      - fawkes-net
+    # healthcheck: inherited from score-service/Dockerfile (node healthcheck.js) — no curl in node:alpine
+    restart: unless-stopped
+
+  # Plugin Manager - Extension Point Management
+  plugin-manager:
+    build:
+      context: ./plugin-manager
+      dockerfile: Dockerfile
+    container_name: developerd-plugin-manager
+    ports:
+      - "${PLUGIN_MANAGER_PORT:-8083}:8083"
+    environment:
+      - API_PORT=8083
+      - PLUGIN_DIR=/plugins
+      - REGISTRY_URL=${PLUGIN_REGISTRY_URL:-}
+      - AUTH_PROVIDER=local
+    volumes:
+      - plugin-registry:/plugins
+      # WARNING: Mounting Docker socket provides root-level access to host
+      # Only needed if plugin manager needs to manage containers
+      # For production, use Kubernetes API or remove this mount
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - fawkes-net
+    # healthcheck: inherited from plugin-manager/Dockerfile (node healthcheck.js) — no curl in node:alpine
+    restart: unless-stopped
+
+  # API Gateway - Central REST API and Webhook Router
+  gateway:
+    image: nginx:1.27-alpine
+    container_name: developerd-gateway
+    ports:
+      - "${GATEWAY_PORT:-8000}:8000"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./gateway/api-docs:/usr/share/nginx/html/api-docs:ro
+    networks:
+      - fawkes-net
+    depends_on:
+      - backstage
+      - score-service
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+secrets:
+  backstage_db_password:
+    environment: BACKSTAGE_DB_PASSWORD
+
+networks:
+  fawkes-net:
+    external: true
+    name: fawkes-net
+
+volumes:
+  coder-home:
+    name: developerd-coder-home
+  backstage-plugins:
+    name: developerd-backstage-plugins
+  score-specs:
+    name: developerd-score-specs
+  score-plugins:
+    name: developerd-score-plugins
+  plugin-registry:
+    name: developerd-plugin-registry

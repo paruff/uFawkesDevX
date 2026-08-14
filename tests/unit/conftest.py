@@ -13,13 +13,13 @@ def project_root():
 
 @pytest.fixture
 def docker_compose_file(project_root):
-    """Return the docker-compose.yml file path."""
-    return project_root / "docker-compose.yml"
+    """Return the compose.yaml file path."""
+    return project_root / "compose.yaml"
 
 
 @pytest.fixture
 def docker_compose_config(docker_compose_file):
-    """Load and return the docker-compose.yml configuration."""
+    """Load and return the compose.yaml configuration."""
     with open(docker_compose_file) as f:
         return yaml.safe_load(f)
 
