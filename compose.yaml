@@ -79,6 +79,7 @@ services:
       - WEBHOOK_PORT=8082
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/score
       - PIPELINE_TRIGGER_ENABLED=${PIPELINE_TRIGGER_ENABLED:-true}
+      - PIPELINE_WEBHOOK_URL=${PIPELINE_WEBHOOK_URL:-}
       - AUTH_PROVIDER=local
       - LOG_LEVEL=${LOG_LEVEL:-info}
     volumes:
