@@ -20,6 +20,7 @@ check-gid: ## Print the host docker.sock group GID for DOCKER_GID in .env
 
 start: network ## Start all services
 	@echo "Starting Developer Control Plane..."
+	@grep -q localhost .env 2>/dev/null && echo "WARNING: CODER_ACCESS_URL must not be localhost" || true
 	docker compose up -d
 	@echo "Services starting... Use 'make status' to check progress"
 	@echo "Access the platform at http://localhost:8000"
