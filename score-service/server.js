@@ -154,7 +154,17 @@ async function initDatabase() {
 // CLI. Runs in an isolated per-workload directory since `score-compose init`
 // writes state (.score-compose/) into its cwd.
 async function generateComposeFromSpec(name, specPath) {
-  const projectDir = path.join(SPECS_DIR, '.compose-projects', name);
+  // Re-validate name here too: this function must be safe to call with any
+  // string, not just from the already-validated POST /api/v1/specs path.
+  if (!/^[a-z0-9-]+$/.test(name)) {
+    throw new Error('Invalid workload name');
+  }
+
+  const compoundProjectsDir = path.resolve(SPECS_DIR, '.compose-projects');
+  const projectDir = path.resolve(compoundProjectsDir, name);
+  if (!projectDir.startsWith(compoundProjectsDir + path.sep)) {
+    throw new Error('Resolved project directory escapes .compose-projects');
+  }
   await fs.mkdir(projectDir, { recursive: true });
 
   const scoreComposeStateDir = path.join(projectDir, '.score-compose');
