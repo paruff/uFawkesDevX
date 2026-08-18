@@ -50,6 +50,7 @@ It provides Backstage, Score service, Eclipse Che, Plugin Manager, and the gatew
 - Shell scripts in `scripts/` pass `shellcheck` and `shfmt`.
 - Pre-commit config is the local gate; CI runs the same checks.
 - All scripts are idempotent.
+- Never swallow an exception in a check/validator without logging what broke — a bare catch-and-continue makes a check that never ran look identical to one that ran and found nothing.
 
 ## §5 PM-Agent Contract
 
