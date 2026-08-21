@@ -85,6 +85,7 @@ class TestWorkflowValidation:
             "aquasecurity/",
             "ludeeus/",
             "golangci/",
+            "anomalyco/",  # opencode.yml -- vendored assistant action (opencode.ai)
         ]
         for f in workflow_files:
             with open(f) as fh:
