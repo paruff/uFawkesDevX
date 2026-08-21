@@ -28,7 +28,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-WORKFLOW_PATH = Path(__file__).parent.parent.parent / ".github" / "workflows" / "opencode.yml"
+WORKFLOW_PATH = (
+    Path(__file__).parent.parent.parent / ".github" / "workflows" / "opencode.yml"
+)
 
 DEFAULT_MODEL = "opencode/deepseek-v4-flash-free"
 ESCALATED_MODEL = "nvidia/nvidia/nemotron-3-ultra-550b-a55b"
@@ -48,7 +50,11 @@ def _load_if_expression() -> str:
 def _load_resolve_model_script() -> str:
     with open(WORKFLOW_PATH) as f:
         workflow = yaml.safe_load(f)
-    step = next(s for s in workflow["jobs"]["opencode"]["steps"] if s.get("id") == "resolve_model")
+    step = next(
+        s
+        for s in workflow["jobs"]["opencode"]["steps"]
+        if s.get("id") == "resolve_model"
+    )
     return str(step["run"])
 
 
@@ -58,7 +64,9 @@ def _evaluate_if(expr: str, body: str, user_type: str) -> bool:
     py_expr = py_expr.replace("github.event.comment.body", "_body")
     py_expr = re.sub(r"contains\(", "_contains(", py_expr)
     py_expr = py_expr.replace("&&", " and ").replace("||", " or ")
-    return bool(eval(py_expr, {"_contains": _contains, "_body": body, "_user_type": user_type}))
+    return bool(
+        eval(py_expr, {"_contains": _contains, "_body": body, "_user_type": user_type})
+    )
 
 
 def triggers(body: str, user_type: str = "User") -> bool:
@@ -74,7 +82,9 @@ def preferred_model(body: str) -> str:
 
     escalated_match = re.search(r'PREFERRED="([^"]+)"\s*\n\s*else', script)
     default_match = re.search(r"else\s*\n\s*PREFERRED=\"([^\"]+)\"", script)
-    assert escalated_match and default_match, "resolve_model script structure changed unexpectedly"
+    assert escalated_match and default_match, (
+        "resolve_model script structure changed unexpectedly"
+    )
     escalated = escalated_match.group(1)
     default = default_match.group(1)
 
@@ -116,7 +126,10 @@ class TestModelRouting:
         assert preferred_model("/oc [security] fix this CVE") == ESCALATED_MODEL
 
     def test_feature_bracket_tag_routes_to_escalated_model(self):
-        assert preferred_model("/oc [feature] implement dark mode toggle") == ESCALATED_MODEL
+        assert (
+            preferred_model("/oc [feature] implement dark mode toggle")
+            == ESCALATED_MODEL
+        )
 
     def test_case_insensitive_bracket_tag_routes_to_escalated_model(self):
         # Regression test: the bash step uses grep -qiF (case-insensitive) to
@@ -126,7 +139,9 @@ class TestModelRouting:
         assert preferred_model("/oc [SECURITY] fix this CVE") == ESCALATED_MODEL
 
     def test_hyphenated_security_tag_does_not_escalate(self):
-        assert preferred_model("/oc-security implement the security fix") == DEFAULT_MODEL
+        assert (
+            preferred_model("/oc-security implement the security fix") == DEFAULT_MODEL
+        )
 
     def test_word_security_without_brackets_does_not_escalate(self):
         assert preferred_model("/oc please review this security issue") == DEFAULT_MODEL
