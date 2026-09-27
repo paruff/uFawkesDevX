@@ -47,7 +47,9 @@ kind: System
 metadata:
   name: ufawkes-res
   title: uFawkesRes
-  description: Shared resource plane (Postgres, Valkey)
+  description: Deprecated — was the shared resource plane (Postgres, Valkey); replacement TBD (uFawkesDevX#57)
+  tags:
+    - deprecated
   links:
     - url: https://github.com/paruff/uFawkesRes
       title: GitHub Repository

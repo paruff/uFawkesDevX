@@ -1,5 +1,12 @@
 # uFawkesDevX — Design v0.2
 
+> **Historical note (2026-09-27):** uFawkesRes, referenced below as the
+> Postgres/Valkey provider, is **deprecated**, and uFawkesSec has merged into
+> uFawkesPipe. What replaces uFawkesRes's Postgres is not decided yet (#57,
+> suite plan AC-DEVX-01). This file moves to `docs/ai-sdlc/v0.1.0/` in the
+> suite plan's Phase 3; until then, treat its uFawkesRes/uFawkesSec mentions
+> as historical.
+
 _Developer Experience Plane of the Fawkes IDP Family_
 
 **Status:** Draft — 2026-06-23

@@ -121,8 +121,8 @@ uFawkesDevX is the Developer Experience plane of the Fawkes IDP suite:
 
 | Repository | Role |
 |---|---|
-| **uFawkesDevX** | DevX — Backstage, Score, Che, Plugin Manager |
-| **uFawkesRes** | Resource management and provisioning |
+| **uFawkesDevX** | DevX — Backstage, Coder, Score, Plugin Manager |
+| **uFawkesRes** | Deprecated — was the shared Postgres/Valkey resource plane (replacement TBD, #57) |
 | **uFawkesObs** | Observability (Prometheus, Grafana, Loki, Tempo) |
 | **fawkes** | Platform CLI, integration orchestration |
 | **uFawkesPipe** | Reusable CI/CD workflow library |

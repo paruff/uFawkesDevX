@@ -1,7 +1,7 @@
 # uFawkesDevX compose.yaml — v0.2 (DX-002)
 # Prerequisites:
-#   - uFawkesRes running (postgres:5432 on fawkes-net) [VERIFY exact hostname/port with uFawkesRes]
-#   - Databases created: "coder" and "backstage" in uFawkesRes Postgres
+#   - An external Postgres reachable as postgres:5432 on fawkes-net (was uFawkesRes, now deprecated; replacement TBD, #57)
+#   - Databases created: "coder" and "backstage" in that Postgres
 #   - fawkes-net created: `make network`
 #   - DOCKER_GID set in .env (run: `make check-gid`)
 #   - CODER_ACCESS_URL set to a LAN-reachable address in .env (not localhost)
