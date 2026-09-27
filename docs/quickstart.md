@@ -2,9 +2,11 @@
 
 ## 0. Prerequisites
 
-[uFawkesRes](https://github.com/paruff/uFawkesRes) must already be running
-on the shared `fawkes-net` network. Create the `coder` and `backstage`
-databases in its Postgres instance before running `make up`:
+A Postgres instance must already be running on the shared `fawkes-net`
+network, reachable as `postgres:5432`. This used to be
+[uFawkesRes](https://github.com/paruff/uFawkesRes), which is **deprecated**; its
+replacement is not decided yet (#57). Create the `coder` and `backstage`
+databases in that Postgres before running `make up`:
 
 ```sql
 CREATE DATABASE coder;
@@ -83,6 +85,6 @@ steps.
 - **Coder stuck on "Connecting..."** — `CODER_ACCESS_URL` is probably set to
   `localhost`. Re-check step 2.
 - **Backstage crash-loops on startup** — the `backstage` database likely
-  doesn't exist yet in uFawkesRes Postgres. Re-check step 0.
+  doesn't exist yet in the external Postgres. Re-check step 0.
 - **Coder can't reach the Docker socket** — `DOCKER_GID` is wrong. Re-run
   `make check-gid` and update `.env`.

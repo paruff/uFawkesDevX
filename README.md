@@ -6,6 +6,8 @@ catalogs and scaffolds services, the Score service validates workload specs
 and triggers uFawkesPipe, and golden-path Cookiecutter templates give
 developers a pre-wired starting point in one command.
 
+**Start here:** [INTENT.md](INTENT.md) — what this repo is, its database status, and non-goals.
+
 ## Architecture
 
 ```
@@ -13,9 +15,9 @@ developers a pre-wired starting point in one command.
 │  fawkes-net  (external Docker bridge)                                              │
 │                                                                                    │
 │  ╔══════════════════════════╗   ╔═════════════════════════════════════════════╗    │
-│  ║  uFawkesRes              ║   ║  uFawkesDevX (this repo)                    ║    │
-│  ║  postgres:5432 [VERIFY]  ║   ║                                             ║    │
-│  ║  valkey:6379   [VERIFY]  ║   ║  gateway:8000  (nginx:1.27-alpine)          ║    │
+│  ║  External Postgres       ║   ║  uFawkesDevX (this repo)                    ║    │
+│  ║  postgres:5432           ║   ║                                             ║    │
+│  ║  (source TBD, #57)       ║   ║  gateway:8000  (nginx:1.27-alpine)          ║    │
 │  ╚══════════════════════════╝   ║  backstage:7007  (custom build)             ║    │
 │            ▲   ▲               ║  score-service:8081/8082  (custom build)     ║    │
 │            │   │               ║  plugin-manager:8083  (custom build)         ║    │
@@ -33,7 +35,7 @@ developers a pre-wired starting point in one command.
 │                           └──────────────────────────┘                            │
 │                                                                                    │
 │  ╔══════════════════════╗   ╔═════════════════════════════════════════════════╗   │
-│  ║  uFawkesSec           ║   ║  uFawkesPipe                                    ║   │
+│  ║  uFawkesPipe (Sec)    ║   ║  uFawkesPipe                                    ║   │
 │  ║  infisical:8082       ║   ║  woodpecker-server:8000                         ║   │
 │  ╚══════════════════════╝   ╚═════════════════════════════════════════════════╝   │
 └────────────────────────────────────────────────────────────────────────────────────┘
@@ -49,8 +51,12 @@ developers a pre-wired starting point in one command.
 | Plugin Manager | 8083 | Manages platform extensions and plugins |
 | Gateway | 8000 | Unified entry point — `/api/score`, `/api/plugins` |
 
-Postgres is **not** run in this repo — `coder` and `backstage` connect to the
-shared Postgres instance owned by [uFawkesRes](https://github.com/paruff/uFawkesRes).
+Postgres is **not** run in this repo. `coder`, `backstage`, and `score-service`
+connect to an external Postgres reachable as `postgres:5432` on the `fawkes-net`
+network (see `compose.yaml`). That used to be
+[uFawkesRes](https://github.com/paruff/uFawkesRes), which is **deprecated**; its
+replacement is not decided yet (#57, suite plan AC-DEVX-01). Until it is, you
+must supply that Postgres yourself.
 
 ## Quick start
 
