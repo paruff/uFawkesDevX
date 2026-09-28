@@ -1,5 +1,12 @@
 # uFawkesDevX — Implementation Plan v0.2
 
+> **Historical note (2026-09-27):** uFawkesRes, referenced below as the
+> Postgres/Valkey provider, is **deprecated**, and uFawkesSec has merged into
+> uFawkesPipe. What replaces uFawkesRes's Postgres is not decided yet (#57,
+> suite plan AC-DEVX-01). This file moves to `docs/ai-sdlc/v0.1.0/` in the
+> suite plan's Phase 3; until then, treat its uFawkesRes/uFawkesSec mentions
+> as historical.
+
 _Lean issues for Deepseek v4 flash implementation_
 
 **Status:** Draft — 2026-06-23 (revised from DevPod → Coder + devcontainer standard)

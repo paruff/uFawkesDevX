@@ -12,7 +12,7 @@ install: ## Install and setup the platform
 	@echo "Configuration file created. Edit .env if needed."
 	@echo "Run 'make start' to start the platform"
 
-network: ## Create the external fawkes-net Docker network (shared with uFawkesRes/uFawkesSec)
+network: ## Create the external fawkes-net Docker network (shared with other uFawkes planes)
 	docker network inspect fawkes-net >/dev/null 2>&1 || docker network create fawkes-net
 
 check-gid: ## Print the host docker.sock group GID for DOCKER_GID in .env
