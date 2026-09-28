@@ -46,7 +46,7 @@ __pycache__/
 graphify-out/
 
 # Local AI tool state
-.claude/
+.claude/settings.local.json
 .serena/
 .headroom/
 
