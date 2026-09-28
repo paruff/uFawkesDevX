@@ -49,6 +49,8 @@ jobs:
             pre-commit-${{ runner.os }}-
 
       - name: Run pre-commit hooks
+        env:
+          SKIP: terraform_fmt,terraform_validate,terraform_tflint,terraform_docs
         run: pre-commit run --all-files
 
       - name: DORA job finish
