@@ -330,7 +330,8 @@ repos:
                 found=1
               fi
             done
-            echo "⚠️  ADR-034 violations found (see above)" exit $foundexit $found exit 0
+            if [ "$found" -ne 0 ]; then echo "⚠️  ADR-034 violations found (see above)"; fi
+            exit $found
           ' --
         language: system
         types: [text]
