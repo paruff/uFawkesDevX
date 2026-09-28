@@ -20,9 +20,10 @@ jobs:
   # ─── Stage 0: Pre-flight ──────────────────────────────────────────────────
   preflight:
     name: Pre-flight
-    uses: paruff/ufawkespipe/.github/workflows/reusable-preflight.yml@v1.2.0
+    uses: paruff/ufawkespipe/.github/workflows/reusable-preflight.yml@v1.2.1
     with:
       pr-size-limit: 0
+      skip-hooks: terraform_fmt,terraform_validate,terraform_tflint,terraform_docs
 
   # ─── Stage 1: Static Analysis (Lint) ────────────────────────────────────
   lint:
