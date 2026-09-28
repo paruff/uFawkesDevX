@@ -24,16 +24,51 @@ It provides Backstage, Score service, Eclipse Che, Plugin Manager, and the gatew
 
 ## §3 Context Files
 
-| File | Why |
-|---|---|
-| `compose.yaml` | Service definitions, profiles, volumes, networks |
-| `docker-compose.override.yml` | Dev overrides (ports, volumes, env) |
-| `ARCHITECTURE.md` | System architecture, components, data flows |
-| `docs/ARCHITECTURE.md` | (future) dedicated docs architecture |
-| `docs/KNOWN_LIMITATIONS.md` | Active known issues |
-| `docs/CHANGE_IMPACT_MAP.md` | Co-change map |
-| `docs/PR_STANDARD.md` | PR naming and commit rules |
-| `.github/workflows/` | CI/CD pipeline definitions |
+Read in priority order. Planning docs define *what*; architecture/governance docs define *how*; the queue defines *now*.
+
+| Priority | File | Why |
+| --- | --- | --- |
+| 1 | `VISION.md` | North star, core principles, non-goals, riskiest assumption (years) |
+| 2 | `MILESTONES.md` | Horizon map (H1/H2/H3), milestone deliverables, release gates, traceability to vision (months) |
+| 3 | `EXECUTION_QUEUE.md` | Priority tiers P0–P3, scope-drift protection, bottom-up feedback loop (weeks) |
+| 4 | `plan-for-the-day.md` | Today's single goal, target issues, TDD execution protocol, retrospective (today) |
+| 5 | `docs/product/discovery-draft.md` | JTBD statement, riskiest assumption, measurable acceptance criterion, test-type reasoning |
+| 6 | `docs/product/spec.md` | Numbered functional requirements (FR-1.x … FR-8.x, NFR) traced to discovery draft |
+| 7 | `ARCHITECTURE.md` | System architecture, components, data flows |
+| 8 | `docs/CONTRACTS.md` | External integration surface: uFawkesRes Postgres, uFawkesObs OTLP, uFawkesPipe webhook, fawkes-net |
+| 9 | `docs/CHANGE_IMPACT_MAP.md` | Co-change map: what breaks when configs change |
+| 10 | `docs/KNOWN_LIMITATIONS.md` | Active known issues and workarounds |
+| 11 | `DEPLOYMENT_STRATEGY.md` | Local Compose profiles, networking, secrets, health checks, rollback |
+| 12 | `RELEASE_PROCESS.md` | Release checklist (tests → docs → changelog → tag → deploy+verify), rollback |
+| 13 | `AI_STANCE.md` | AI tooling policy, agent guardrails, hard vs. soft rules |
+| 14 | `docs/MODEL_POLICY.md` | Grade-based model routing (S/A/B/C/F); no hardcoded model names |
+| 15 | `compose.yaml` | Service definitions, profiles, volumes, networks |
+| 16 | `docker-compose.override.yml` | Dev overrides (ports, volumes, env) |
+| 17 | `docs/PR_STANDARD.md` | PR naming and commit rules |
+| 18 | `.github/workflows/` | CI/CD pipeline definitions |
+
+## §3.1 Hard Rules vs. Docs (Never Delegate)
+
+**Hard rules — never delegated to an agent's judgment; enforced by CI/branch protection:**
+
+| Rule | Enforcement |
+| --- | --- |
+| No `:latest` tags in `compose.yaml` | CI gate |
+| No `.env`/real secrets committed | gitleaks CI gate |
+| No direct push to `main` | GitHub branch protection |
+| PR titles follow Conventional Commits | CI gate |
+| Don't modify reusable workflow contracts from `paruff/ufawkespipe` | CI validation |
+| TDD commit order: test → implement → verify → commit | PR review checklist |
+
+**Soft rules — lived in docs; agent may reason about but must document:**
+
+| Rule | Source Doc |
+| --- | --- |
+| Adding a new service to `compose.yaml` | CHANGE_IMPACT_MAP.md + §5 Must Ask |
+| Changing DB schema/seed data | §5 Must Ask + CHANGE_IMPACT_MAP.md |
+| CI/CD pipeline structure changes | §5 Must Ask |
+| Milestone scope changes | MILESTONES.md |
+| New queue item | EXECUTION_QUEUE.md (scope-drift check against VISION non-goals) |
 
 ## §4 Architecture Rules
 
@@ -120,7 +155,7 @@ See `docs/KNOWN_LIMITATIONS.md`.
 uFawkesDevX is the Developer Experience plane of the Fawkes IDP suite:
 
 | Repository | Role |
-|---|---|
+| --- | --- |
 | **uFawkesDevX** | DevX — Backstage, Coder, Score, Plugin Manager |
 | **uFawkesRes** | Deprecated — was the shared Postgres/Valkey resource plane (replacement TBD, #57) |
 | **uFawkesObs** | Observability (Prometheus, Grafana, Loki, Tempo) |

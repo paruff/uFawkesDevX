@@ -1,3 +1,25 @@
+# MIT License
+#
+# Copyright (c) 2026 Phil Ruff
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 # DX-004 outline — for human review before `coder templates push`.
 # Do NOT run `terraform validate` or push this until a human has verified
 # every block below against the live provider docs:
@@ -12,12 +34,15 @@
 # pattern for the Coder version in use.
 
 terraform {
+  required_version = ">= 1.4"
   required_providers {
     coder = {
-      source = "coder/coder" # VERIFY provider version to pin
+      source  = "coder/coder"
+      version = "~> 2.18"
     }
     docker = {
-      source = "kreuzwerker/docker" # VERIFY provider version to pin
+      source  = "kreuzwerker/docker"
+      version = "~> 4.6"
     }
   }
 }
@@ -61,7 +86,7 @@ resource "coder_agent" "main" {
 }
 
 # VERIFY module version pins — see https://registry.coder.com/modules/coder/devcontainers-cli
-module "devcontainers-cli" {
+module "devcontainers_cli" {
   count    = data.coder_workspace.me.start_count
   source   = "registry.coder.com/coder/devcontainers-cli/coder"
   agent_id = coder_agent.main.id
@@ -69,7 +94,7 @@ module "devcontainers-cli" {
 }
 
 # VERIFY module version pins — see https://registry.coder.com/modules/coder/git-clone
-module "git-clone" {
+module "git_clone" {
   count    = data.coder_workspace.me.start_count
   source   = "registry.coder.com/coder/git-clone/coder"
   agent_id = coder_agent.main.id
@@ -84,7 +109,7 @@ module "git-clone" {
 resource "coder_devcontainer" "repo" {
   count            = data.coder_workspace.me.start_count
   agent_id         = coder_agent.main.id
-  workspace_folder = "~/${module.git-clone[0].folder_name}"
+  workspace_folder = "~/${module.git_clone[0].folder_name}"
 }
 
 # VERIFY: docker_volume fields — see
@@ -131,12 +156,12 @@ resource "docker_container" "workspace" {
 
   volumes {
     container_path = "/home/coder"
-    volume_name     = docker_volume.home_volume.name
-    read_only       = false
+    volume_name    = docker_volume.home_volume.name
+    read_only      = false
   }
   volumes {
     container_path = "/var/lib/docker"
-    volume_name     = docker_volume.docker_volume.name
-    read_only       = false
+    volume_name    = docker_volume.docker_volume.name
+    read_only      = false
   }
 }

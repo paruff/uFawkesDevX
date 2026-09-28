@@ -195,7 +195,7 @@ Copy `.env.example` to `.env` and customize:
 ```bash
 # Database
 POSTGRES_USER=backstage
-POSTGRES_PASSWORD=secure_password
+POSTGRES_PASSWORD=secure_password  # pragma: allowlist secret
 
 # Ports
 BACKSTAGE_PORT=7007

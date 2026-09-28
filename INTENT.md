@@ -21,7 +21,7 @@ create the `score` database that `score-service` connects to.
 ## Where this sits in the suite
 
 | Plane | Repo |
-|---|---|
+| --- | --- |
 | Developer experience | **uFawkesDevX** (this repo) |
 | CI/CD + security (Woodpecker; merged uFawkesSec) | uFawkesPipe |
 | Observability | uFawkesObs |

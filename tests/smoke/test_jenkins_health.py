@@ -1,10 +1,11 @@
 """Smoke tests for Jenkins health and basic functionality."""
 
-import pytest
 import subprocess
 import time
-import requests
 from pathlib import Path
+
+import pytest
+import requests
 
 
 class TestJenkinsSmoke:

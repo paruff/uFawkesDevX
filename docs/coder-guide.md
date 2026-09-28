@@ -36,7 +36,7 @@ first Coder-backed devcontainer workspace.
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
-|---|---|---|
+| --- | --- | --- |
 | Workspace agent never connects | `CODER_ACCESS_URL` set to `localhost` | Set it to a LAN-reachable address in `.env` (see DX-002) |
 | `coder templates push` fails on provider resolution | A `# VERIFY` field in `main.tf` doesn't match the installed provider version | Check the version pinned against https://registry.terraform.io/providers/coder/coder/latest/docs |
 | Devcontainer never builds inside the workspace | Repo's `.devcontainer/devcontainer.json` missing or invalid | Validate against `devcontainer/base-*.json` in this repo, or `tests/unit/test_devcontainer.py` |

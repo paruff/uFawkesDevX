@@ -1,10 +1,11 @@
 """Acceptance tests for uFawkesPipe full pipeline."""
 
-import pytest
 import subprocess
 import time
-import requests
 from pathlib import Path
+
+import pytest
+import requests
 
 
 class TestUfawkesPipeAcceptance:
