@@ -49,3 +49,6 @@ graphify-out/
 .claude/
 .serena/
 .headroom/
+
+# Terraform working dirs (created by terraform init / pre-commit)
+.terraform/

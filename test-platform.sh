@@ -15,33 +15,33 @@ NC='\033[0m' # No Color
 
 # Test function
 test_endpoint() {
-    local name=$1
-    local url=$2
-    local expected_code=${3:-200}
+  local name=$1
+  local url=$2
+  local expected_code=${3:-200}
 
-    echo -n "Testing $name... "
+  echo -n "Testing $name... "
 
-    if response=$(curl -s -o /dev/null -w "%{http_code}" "$url" 2>/dev/null); then
-        if [ "$response" -eq "$expected_code" ]; then
-            echo -e "${GREEN}✓${NC} (HTTP $response)"
-            return 0
-        else
-            echo -e "${YELLOW}⚠${NC} (HTTP $response, expected $expected_code)"
-            return 1
-        fi
+  if response=$(curl -s -o /dev/null -w "%{http_code}" "$url" 2> /dev/null); then
+    if [ "$response" -eq "$expected_code" ]; then
+      echo -e "${GREEN}✓${NC} (HTTP $response)"
+      return 0
     else
-        echo -e "${RED}✗${NC} (Connection failed)"
-        return 1
+      echo -e "${YELLOW}⚠${NC} (HTTP $response, expected $expected_code)"
+      return 1
     fi
+  else
+    echo -e "${RED}✗${NC} (Connection failed)"
+    return 1
+  fi
 }
 
 # Check if services are running
 echo "1. Checking service status..."
 if docker compose ps | grep -q "Up"; then
-    echo -e "${GREEN}✓${NC} Services are running"
+  echo -e "${GREEN}✓${NC} Services are running"
 else
-    echo -e "${YELLOW}⚠${NC} Some services may not be running"
-    docker compose ps
+  echo -e "${YELLOW}⚠${NC} Some services may not be running"
+  docker compose ps
 fi
 echo ""
 
@@ -65,16 +65,16 @@ echo "4. Testing Score API functionality..."
 # List specs (should be empty initially)
 echo -n "Listing Score specs... "
 if curl -s http://localhost:8081/api/v1/specs | grep -q "specs"; then
-    echo -e "${GREEN}✓${NC}"
+  echo -e "${GREEN}✓${NC}"
 else
-    echo -e "${RED}✗${NC}"
+  echo -e "${RED}✗${NC}"
 fi
 
 # Create a test spec
 echo -n "Creating test Score spec... "
 response=$(curl -s -X POST http://localhost:8081/api/v1/specs \
-    -H "Content-Type: application/json" \
-    -d '{
+  -H "Content-Type: application/json" \
+  -d '{
         "apiVersion": "score.dev/v1b1",
         "metadata": {
             "name": "test-app"
@@ -84,35 +84,35 @@ response=$(curl -s -X POST http://localhost:8081/api/v1/specs \
                 "image": "nginx:latest"
             }
         }
-    }' 2>/dev/null)
+    }' 2> /dev/null)
 
 if echo "$response" | grep -q "test-app"; then
-    echo -e "${GREEN}✓${NC}"
+  echo -e "${GREEN}✓${NC}"
 else
-    echo -e "${RED}✗${NC} Response: $response"
+  echo -e "${RED}✗${NC} Response: $response"
 fi
 
 # Get the created spec
 echo -n "Retrieving test Score spec... "
 if curl -s http://localhost:8081/api/v1/specs/test-app | grep -q "test-app"; then
-    echo -e "${GREEN}✓${NC}"
+  echo -e "${GREEN}✓${NC}"
 else
-    echo -e "${RED}✗${NC}"
+  echo -e "${RED}✗${NC}"
 fi
 
 # Trigger pipeline
 echo -n "Triggering pipeline... "
 pipeline_response=$(curl -s -X POST http://localhost:8082/webhooks/pipeline/trigger \
-    -H "Content-Type: application/json" \
-    -d '{
+  -H "Content-Type: application/json" \
+  -d '{
         "workload": "test-app",
         "action": "deploy"
-    }' 2>/dev/null)
+    }' 2> /dev/null)
 
 if echo "$pipeline_response" | grep -q "Pipeline triggered"; then
-    echo -e "${GREEN}✓${NC}"
+  echo -e "${GREEN}✓${NC}"
 else
-    echo -e "${RED}✗${NC}"
+  echo -e "${RED}✗${NC}"
 fi
 
 echo ""
@@ -122,16 +122,16 @@ echo "5. Testing Plugin Manager..."
 
 echo -n "Listing plugins... "
 if curl -s http://localhost:8083/api/v1/plugins | grep -q "plugins"; then
-    echo -e "${GREEN}✓${NC}"
+  echo -e "${GREEN}✓${NC}"
 else
-    echo -e "${RED}✗${NC}"
+  echo -e "${RED}✗${NC}"
 fi
 
 echo -n "Listing extension points... "
 if curl -s http://localhost:8083/api/v1/extension-points | grep -q "extensionPoints"; then
-    echo -e "${GREEN}✓${NC}"
+  echo -e "${GREEN}✓${NC}"
 else
-    echo -e "${RED}✗${NC}"
+  echo -e "${RED}✗${NC}"
 fi
 
 echo ""
@@ -141,16 +141,16 @@ echo "6. Testing API Gateway routing..."
 
 echo -n "Score API via Gateway... "
 if curl -s http://localhost:8000/api/score/specs | grep -q "specs"; then
-    echo -e "${GREEN}✓${NC}"
+  echo -e "${GREEN}✓${NC}"
 else
-    echo -e "${RED}✗${NC}"
+  echo -e "${RED}✗${NC}"
 fi
 
 echo -n "Plugin Manager via Gateway... "
 if curl -s http://localhost:8000/api/plugins/plugins | grep -q "plugins"; then
-    echo -e "${GREEN}✓${NC}"
+  echo -e "${GREEN}✓${NC}"
 else
-    echo -e "${RED}✗${NC}"
+  echo -e "${RED}✗${NC}"
 fi
 
 echo ""
@@ -159,16 +159,16 @@ echo ""
 echo "7. Testing database connectivity..."
 echo -n "PostgreSQL connection... "
 if docker compose exec -T postgres psql -U backstage -d backstage -c "SELECT 1" > /dev/null 2>&1; then
-    echo -e "${GREEN}✓${NC}"
+  echo -e "${GREEN}✓${NC}"
 else
-    echo -e "${RED}✗${NC}"
+  echo -e "${RED}✗${NC}"
 fi
 
 echo -n "Score database... "
 if docker compose exec -T postgres psql -U backstage -d score -c "SELECT 1" > /dev/null 2>&1; then
-    echo -e "${GREEN}✓${NC}"
+  echo -e "${GREEN}✓${NC}"
 else
-    echo -e "${RED}✗${NC}"
+  echo -e "${RED}✗${NC}"
 fi
 
 echo ""

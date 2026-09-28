@@ -92,7 +92,7 @@ a warning) and spec creation still succeeds.
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
-|---|---|---|
+| --- | --- | --- |
 | `composeGenerated: false` in the API response | `score-compose` binary missing or spec invalid for generation | Check `score-service` container logs for the `score-compose generate failed for <name>` error |
 | `Pipeline webhook unreachable` warning in logs | `PIPELINE_WEBHOOK_URL` unset, unreachable, or endpoint doesn't exist yet upstream | Expected until uFawkesPipe's trigger endpoint is confirmed — spec creation is unaffected |
 | `score-compose: command not found` at build time | Dockerfile's `TARGETARCH` build arg didn't resolve | Ensure you're building with BuildKit enabled (default in recent Docker) |

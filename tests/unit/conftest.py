@@ -1,8 +1,9 @@
 """Shared test fixtures for uFawkesDevX unit tests."""
 
+from pathlib import Path
+
 import pytest
 import yaml
-from pathlib import Path
 
 
 @pytest.fixture

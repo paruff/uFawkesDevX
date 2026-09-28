@@ -5,7 +5,7 @@ platform: a pinned devcontainer (Coder-ready), a Score workload spec, and a
 `.fawkespipe.yml` CI/CD contract.
 
 | Template | Language | Framework |
-|---|---|---|
+| --- | --- | --- |
 | `templates/python-flask-app` | Python 3.12 | Flask |
 | `templates/java-spring-app` | Java 21 | Spring Boot |
 | `templates/node-express-app` | Node.js 20 | Express |
