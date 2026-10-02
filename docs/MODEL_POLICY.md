@@ -59,7 +59,7 @@ Triggers: `rate_limit`, `timeout`, `server_error`
 |-----------|-------|--------|
 | **compose.yaml service structure change** | S | Cross-plane impact via CHANGE_IMPACT_MAP.md; multi-service coordination |
 | **CI pipeline (.github/workflows) stage changes** | S | Pipeline gate changes affect every build; DORA logging critical |
-| **CONTRACTS.md contract changes** | S | Breaking changes affect uFawkesRes/Obs/Pipe; requires coordination |
+| **CONTRACTS.md contract changes** | S | Breaking changes affect Obs/Pipe and the Postgres provider; requires coordination |
 | **Score spec schema (**`scores.dev/v1beta1`**) changes** | S | Semantic validation logic; breaking changes block deploys |
 | **Score Service CRUD API (FR-3.x)** | A | REST endpoint + PG persistence, known patterns |
 | **Plugin Manager install/list/uninstall (FR-5.x)** | A | File-system registry + Backstage hot-reload integration |

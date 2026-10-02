@@ -27,7 +27,7 @@
 | FR-2.2 | Software Catalog contains entities for all 5 platform services + 3 example workloads | JTBD: Catalog Utility | `curl -s http://localhost:7007/api/catalog/entities \| jq '.items \| length'` ≥ 8 | Live-System |
 | FR-2.3 | Each catalog entity has: `metadata.name`, `spec.type`, `spec.lifecycle`, `spec.owner`, `spec.system` | JTBD: Catalog Utility | Schema validation passes for all entities | Contract |
 | FR-2.4 | TechDocs builds and serves documentation for all catalog entities | JTBD: Catalog Utility | `curl -f http://localhost:7007/docs/<entity>/` returns HTML | Integration |
-| FR-2.5 | Backstage persists catalog to PostgreSQL (external, via uFawkesRes) | Architecture | `psql -h postgres -U backstage -c "SELECT count(*) FROM catalog_entities"` > 0 | Integration |
+| FR-2.5 | Backstage persists catalog to PostgreSQL (external; provider TBD, #57) | Architecture | `psql -h postgres -U backstage -c "SELECT count(*) FROM catalog_entities"` > 0 | Integration |
 | FR-2.6 | Backstage authenticates via local provider (dev) | Architecture | Login with `user:user` works | Live-System |
 
 ---
@@ -41,7 +41,7 @@
 | FR-3.3 | `PUT /api/v1/score/:id` updates an existing spec; returns 200 | JTBD: Score-Driven Specs | `curl -X PUT -d @spec2.yaml http://localhost:8081/api/v1/score/<id>` → 200 | Contract |
 | FR-3.4 | `DELETE /api/v1/score/:id` removes a spec; returns 204 | JTBD: Score-Driven Specs | `curl -X DELETE http://localhost:8081/api/v1/score/<id>` → 204 | Contract |
 | FR-3.5 | `POST /api/v1/score/validate` validates a spec without persisting; returns 200 + errors[] | JTBD: Spec Validation | Invalid spec → 200 + `{errors: ["missing required field: ..."]}` | Contract |
-| FR-3.6 | Specs persisted to PostgreSQL (external, via uFawkesRes) in `score` database | Architecture | `psql -h postgres -U score -c "SELECT count(*) FROM specs"` matches API count | Integration |
+| FR-3.6 | Specs persisted to PostgreSQL (external; provider TBD, #57) in `score` database | Architecture | `psql -h postgres -U score -c "SELECT count(*) FROM specs"` matches API count | Integration |
 | FR-3.7 | Score CLI (`score` binary) works against local service | JTBD: Score-Driven Specs | `score validate spec.yaml --api http://localhost:8081` passes | Live-System |
 
 ---
@@ -54,7 +54,7 @@
 | FR-4.2 | Devcontainer includes: Node 20, Go 1.22, Python 3.12, Docker CLI, kubectl, kustomize, Score CLI | JTBD: Inner Loop in Cloud IDE | `make check-toolchain` verifies all versions | Live-System |
 | FR-4.3 | Workspace mounts `score-specs` and `plugin-registry` volumes for live editing | JTBD: Inner Loop in Cloud IDE | `ls /home/coder/workspace/specs` shows specs | Integration |
 | FR-4.4 | Coder authenticates via local provider (dev) | Architecture | Login with `user:user` works | Live-System |
-| FR-4.5 | Coder persists to PostgreSQL (external, via uFawkesRes) in `coder` database | Architecture | `psql -h postgres -U coder -c "SELECT count(*) FROM workspaces"` > 0 | Integration |
+| FR-4.5 | Coder persists to PostgreSQL (external; provider TBD, #57) in `coder` database | Architecture | `psql -h postgres -U coder -c "SELECT count(*) FROM workspaces"` > 0 | Integration |
 
 ---
 
