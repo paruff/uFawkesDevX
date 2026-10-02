@@ -1,0 +1,13 @@
+# Paths whose changes need a docs/ai-sdlc/**/plan.md with a
+# "## Verification Strategy" in the same PR. One git pathspec per line.
+# Content (docs, Markdown pages) is deliberately not listed.
+compose.yaml
+backstage/
+coder/
+devcontainer/
+gateway/
+plugin-manager/
+postgres/
+score-service/
+templates/
+scripts/
