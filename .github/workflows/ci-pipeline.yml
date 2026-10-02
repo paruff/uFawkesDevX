@@ -55,7 +55,7 @@ jobs:
   build:
     name: Build & Validate
     needs: [security, dependency-review]
-    uses: paruff/ufawkespipe/.github/workflows/reusable-build.yml@v1.2.0
+    uses: paruff/ufawkespipe/.github/workflows/reusable-build.yml@v1.2.1
     with:
       fail-on-latest: false
       enable-coverage-gate: false
