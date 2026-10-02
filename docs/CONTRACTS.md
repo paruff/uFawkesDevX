@@ -2,24 +2,24 @@
 
 **Status:** Active | **Owner:** Platform Team | **Last Updated:** 2026-09-14
 
-> **Purpose:** Documents the external integration surface of uFawkesDevX — what contracts other planes (`uFawkesRes`, `uFawkesObs`, `uFawkesPipe`) expect from this repo, and what this repo expects from them. A breaking change to any contract requires coordination with the owning plane before merging.
+> **Purpose:** Documents the external integration surface of uFawkesDevX — what contracts other planes (`uFawkesObs`, `uFawkesPipe`) expect from this repo, and what this repo expects from them. A breaking change to any contract requires coordination with the owning plane before merging.
 
 ---
 
 ## Contract Inventory
 
-### C1 — uFawkesRes Postgres (inbound to DevX)
+### C1 — External Postgres (inbound to DevX)
 
 | Aspect | Value |
 |---|---|
-| Direction | uFawkesDevX consumes uFawkesRes |
+| Direction | uFawkesDevX consumes an external Postgres (formerly uFawkesRes, which is deprecated; replacement TBD, #57) |
 | Transport | TCP on `fawkes-net`, host `postgres`, port `5432` |
 | DBs used | `coder`, `backstage`, `score` |
 | Credentials | `.env` → `CODER_DB_PASSWORD`, `BACKSTAGE_DB_PASSWORD`, `POSTGRES_PASSWORD` |
-| Owner | uFawkesRes |
+| Owner | Undecided until #57 picks a provider |
 | Breaking change | Postgres hostname/port/schema change, DB drop, or version bump (PG 15 → 16) |
 | Verification | `psql -h postgres -U <user> -c "SELECT 1"` for each DB |
-| Change process | Coordinate with uFawkesRes maintainer; require both repos' CI green |
+| Change process | Coordinate with the Postgres provider's owner once #57 decides one; require both repos' CI green |
 
 **Schema expectations (DevX side):** Backstage manages its own schema; Coder manages its own. Score Service expects a `specs` table (id UUID, name, spec YAML, timestamps) — created by its own migration on startup.
 

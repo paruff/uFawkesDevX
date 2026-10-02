@@ -20,9 +20,9 @@
 |---|---|---|---|
 | **Docker** 20.10+ | Host install | Yes | `docker --version` |
 | **Docker Compose** v2.0+ | Host install | Yes | `docker compose version` |
-| **fawkes-net** | `make network` | Yes | Shared external network with uFawkesRes |
-| **PostgreSQL** | uFawkesRes | Yes | `postgres:5432` on `fawkes-net` |
-| **Valkey** (Redis) | uFawkesRes | Optional | Only if Coder needs session store |
+| **fawkes-net** | `make network` | Yes | Shared external network (the Postgres provider joins it) |
+| **PostgreSQL** | External (uFawkesRes is deprecated; replacement TBD, #57) | Yes | `postgres:5432` on `fawkes-net` |
+| **Valkey** (Redis) | External (same provider as Postgres) | Optional | Only if Coder needs session store |
 | **DOCKER_GID** | `.env` | Yes | `make check-gid` to determine |
 
 ### Services (Internal)
@@ -54,7 +54,7 @@
 │                   fawkes-net (external)                  │
 │                                                          │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐ │
-│  │  uFawkesRes  │  │  uFawkesDevX │  │  uFawkesObs    │ │
+│  │  Postgres    │  │  uFawkesDevX │  │  uFawkesObs    │ │
 │  │  postgres    │  │  gateway     │  │  otel-collector│ │
 │  │  valkey      │  │  backstage   │  │  prometheus    │ │
 │  └──────┬──────┘  │  score       │  │  grafana       │ │
@@ -101,7 +101,7 @@ make health         # check all services report healthy
 ```
 
 **Dependency Order:**
-1. PostgreSQL (uFawkesRes) must be running first
+1. PostgreSQL (external; uFawkesRes is deprecated, replacement TBD, #57) must be running first
 2. Gateway depends on Backstage + Score Service (via `depends_on`)
 3. Backstage depends on PostgreSQL (external)
 4. Score Service depends on PostgreSQL (external)

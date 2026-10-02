@@ -48,12 +48,12 @@ Gateway (nginx:8000)
   └── CONFLICT: changing gateway/nginx.conf affects all routed services
 
 Backstage (:7007)
-  ├── depends_on: PostgreSQL (external: uFawkesRes)
+  ├── depends_on: PostgreSQL (external; provider TBD, #57)
   ├── reads: backstage/catalog/*.yaml
   └── CONFLICT: new catalog entity YAMLs need Backstage restart
 
 Score Service (:8081/:8082)
-  ├── depends_on: PostgreSQL (external: uFawkesRes)
+  ├── depends_on: PostgreSQL (external; provider TBD, #57)
   ├── reads: score-service/config/*
   ├── writes: score-specs/ volume
   └── CONFLICT: DB schema changes affect all score-service clients
@@ -64,7 +64,7 @@ Plugin Manager (:8083)
   └── CONFLICT: plugin install affects Backstage hot-reload
 
 Coder (:7080)
-  ├── depends_on: PostgreSQL (external: uFawkesRes)
+  ├── depends_on: PostgreSQL (external; provider TBD, #57)
   ├── mounts: /var/run/docker.sock
   └── CONFLICT: CODER_ACCESS_URL must be set correctly for workspace URLs
 ```
@@ -75,7 +75,7 @@ Coder (:7080)
 
 | Dependency | Change | Impact on uFawkesDevX | Verification |
 |---|---|---|---|
-| **uFawkesRes Postgres** | Schema change, port change, or downtime | `coder`, `backstage`, `score-service` fail to start | `psql -h postgres -U backstage -c "SELECT 1"` |
+| **External Postgres** | Schema change, port change, or downtime | `coder`, `backstage`, `score-service` fail to start | `psql -h postgres -U backstage -c "SELECT 1"` |
 | **uFawkesObs OTLP** (future) | Collector port or protocol change | Telemetry silently dropped; no metrics/logs/traces | `curl http://localhost:8888/metrics` |
 | **uFawkesPipe** (future) | Webhook URL or payload change | Score Service pipeline triggers fail | `curl http://localhost:8081/api/v1/pipelines` |
 | **Backstage upstream** (npm) | Breaking change in @backstage/* packages | Backstage build fails; catalog/templates break | `docker compose build backstage` |
