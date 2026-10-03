@@ -92,6 +92,12 @@ Score service validates them and triggers uFawkesPipe builds. See
 
 Eclipse Che has been removed from this platform and replaced by Coder.
 
+## Design and brand
+
+This repo follows the shared Fawkes and uFawkes design reference:
+[DESIGN.md](https://github.com/paruff/uFawkes.dev/blob/main/DESIGN.md), with tokens at <https://ufawkes.dev/design/tokens.json>. It is owned by
+[uFawkes.dev](https://github.com/paruff/uFawkes.dev).
+
 ## License
 
 See [LICENSE](LICENSE).
