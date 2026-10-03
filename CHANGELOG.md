@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/paruff/uFawkesDevX/compare/v1.0.0...v1.0.1) (2026-10-03)
+
+
+### Chores
+
+* **devcontainer:** declare hostRequirements (2 CPUs, 4 GB) ([#94](https://github.com/paruff/uFawkesDevX/issues/94)) ([41ee9eb](https://github.com/paruff/uFawkesDevX/commit/41ee9ebd2cb86c9636371e7052d21cddb60fe096))
+* **devcontainer:** pin fawkes-space 2.0.0-rc.3 ([#92](https://github.com/paruff/uFawkesDevX/issues/92)) ([a8320d4](https://github.com/paruff/uFawkesDevX/commit/a8320d463db448123f0ce1ab5aac0e852784aa33))
+
 ## 1.0.0 (2026-10-03)
 
 
