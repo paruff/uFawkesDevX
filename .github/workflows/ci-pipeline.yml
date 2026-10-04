@@ -20,7 +20,7 @@ jobs:
   # ─── Stage 0: Pre-flight ──────────────────────────────────────────────────
   preflight:
     name: Pre-flight
-    uses: paruff/ufawkespipe/.github/workflows/reusable-preflight.yml@v1.2.1
+    uses: paruff/ufawkespipe/.github/workflows/reusable-preflight.yml@56226a057899ec3407c7a5c6bd5182d88783d2d2 # v1.11.0-beta.1
     with:
       pr-size-limit: 0
       skip-hooks: terraform_fmt,terraform_validate,terraform_tflint,terraform_docs
@@ -29,13 +29,13 @@ jobs:
   lint:
     name: Static Analysis
     needs: [preflight]
-    uses: paruff/ufawkespipe/.github/workflows/reusable-lint.yml@v1.2.1
+    uses: paruff/ufawkespipe/.github/workflows/reusable-lint.yml@7e1d40f40d4b75580a9aab4273465b8883c9f201 # v1.2.1
 
   # ─── Stage 2: Security Scanning ─────────────────────────────────────────
   security:
     name: Security Scanning
     needs: [lint]
-    uses: paruff/ufawkespipe/.github/workflows/reusable-security-scanning.yml@v1.2.1
+    uses: paruff/ufawkespipe/.github/workflows/reusable-security-scanning.yml@7e1d40f40d4b75580a9aab4273465b8883c9f201 # v1.2.1
     with:
       scan-type: all
       severity-threshold: MEDIUM
@@ -46,7 +46,7 @@ jobs:
   dependency-review:
     name: Dependency Review
     needs: [lint]
-    uses: paruff/ufawkespipe/.github/workflows/reusable-dependency-review.yml@v1.2.1
+    uses: paruff/ufawkespipe/.github/workflows/reusable-dependency-review.yml@7e1d40f40d4b75580a9aab4273465b8883c9f201 # v1.2.1
     with:
       fail-on-severity: high
       comment-summary-in-pr: "true"
@@ -55,7 +55,7 @@ jobs:
   build:
     name: Build & Validate
     needs: [security, dependency-review]
-    uses: paruff/ufawkespipe/.github/workflows/reusable-build.yml@v1.2.1
+    uses: paruff/ufawkespipe/.github/workflows/reusable-build.yml@7e1d40f40d4b75580a9aab4273465b8883c9f201 # v1.2.1
     with:
       fail-on-latest: false
       enable-coverage-gate: false
@@ -64,7 +64,7 @@ jobs:
   tests:
     name: Tests
     needs: [build]
-    uses: paruff/ufawkespipe/.github/workflows/reusable-tests.yml@v1.2.1
+    uses: paruff/ufawkespipe/.github/workflows/reusable-tests.yml@7e1d40f40d4b75580a9aab4273465b8883c9f201 # v1.2.1
     with:
       test-tiers: "unit"
       python-version: "3.11"
