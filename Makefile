@@ -1,4 +1,4 @@
-.PHONY: help start stop restart logs build clean health status install test test-unit test-integration test-smoke test-acceptance validate pre-commit-setup pre-commit-run network check-gid up down coder-push-template
+.PHONY: help start stop restart logs build clean health status install test test-unit test-integration test-smoke test-acceptance validate pre-commit-setup pre-commit-run network check-gid up down coder-push-template doctor
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -130,3 +130,6 @@ pre-commit-run: ## Run pre-commit hooks on all files
 
 coder-push-template: ## Push the devcontainer workspace template to Coder (requires Coder running)
 	cd coder/templates/devcontainer-docker && coder templates push devcontainer-docker
+
+doctor: ## Are this clone's checks actually running? (hooks installed, tools, stamps, CI parity)
+	@bash scripts/shift-left.sh doctor
