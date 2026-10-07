@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/paruff/uFawkesDevX/compare/v1.0.1...v1.1.0) (2026-10-07)
+
+
+### Added
+
+* **shift-left:** adopt uFawkesPipe's shared shift-left hooks (C4) ([#95](https://github.com/paruff/uFawkesDevX/issues/95)) ([69a8635](https://github.com/paruff/uFawkesDevX/commit/69a863556f9db99b5c1491dab1f5978b6700e077))
+
+
+### Fixed
+
+* **deps:** bump proxy-addr to 2.0.8 to clear CVE-2026-90711 ([#103](https://github.com/paruff/uFawkesDevX/issues/103)) ([c9143cc](https://github.com/paruff/uFawkesDevX/commit/c9143ccc81bd26653be97ce4fde75b4cda34334c))
+
 ## [1.0.1](https://github.com/paruff/uFawkesDevX/compare/v1.0.0...v1.0.1) (2026-10-03)
 
 
