@@ -327,6 +327,31 @@ repos:
         name: Validate dependabot.yml schema
 
   # ============================================================================
+  # Type-check the repo's JavaScript (shift-left spec R2, decided 2026-10-06).
+  # tsc runs from pre-commit's own node environment, so the services' package.json
+  # trees are untouched. Their own dependencies aren't installed there, so an
+  # import of a package without types is left unchecked, not an error.
+  # ============================================================================
+  - repo: local
+    hooks:
+      - id: tsc
+        name: Type-check JavaScript (tsc)
+        # Unresolved third-party imports (TS2307) are expected here and ignored. Any
+        # other type error fails, and so does tsc failing without reporting one.
+        entry: |
+          bash -c '
+            out="$(tsc --ignoreConfig --strict false --noEmit --allowJs --checkJs --target es2022 --module nodenext --moduleResolution nodenext --typeRoots "$NODE_PATH/@types" --types node "$@" 2>&1)" && exit 0
+            rest="$(printf "%s\n" "$out" | grep "error TS" | grep -v "TS2307")"
+            if [ -n "$rest" ]; then printf "%s\n" "$rest"; exit 1; fi
+            printf "%s\n" "$out" | grep -q "error TS" && exit 0
+            printf "%s\n" "$out"; exit 1
+          ' --
+        language: node
+        additional_dependencies: ["typescript@7.0.2", "@types/node"]
+        files: ^(score-service|plugin-manager)/.*\.js$
+        exclude: \.test\.js$
+
+  # ============================================================================
   # Shared shift-left hooks from uFawkesPipe (keep last: the stamps record that
   # every hook above ran). Tools that aren't hooks run through scripts/shift-left.sh.
   # ============================================================================
