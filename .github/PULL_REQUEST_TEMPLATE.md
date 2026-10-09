@@ -33,7 +33,7 @@
 - [ ] No modifications to AGENTS.md (edit source, not symlinks)
 - [ ] No `--no-verify` or hook bypasses
 - [ ] Changes to `docs/ai-sdlc/**/` include intent → spec → plan chain
-- [ ] `npm run verify` passes locally before requesting review
+- [ ] `pre-commit run --all-files` passes locally before requesting review
 - [ ] Symlinks (CLAUDE.md, .cursorrules, .github/copilot-instructions.md) still point to AGENTS.md
 - [ ] Backstage/Coder configs have version-pinned images
 - [ ] Templates use `{{PLACEHOLDERS}}` for consumer values
@@ -47,7 +47,7 @@
 
 ## Checklist
 
-- [ ] `npm run verify` passes (lint + typecheck + tests + artifact-chain)
+- [ ] `pre-commit run --all-files` and `make test-unit` pass (lint + format + tests + artifact-chain)
 - [ ] PR is < 400 changed lines, OR `large-pr-approved` label has been applied by a human
 - [ ] No secrets or credentials in any changed file
 - [ ] New features are behind a feature flag (if applicable)
