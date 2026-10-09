@@ -5,6 +5,28 @@ All notable changes to uFawkesDevX will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0](https://github.com/paruff/uFawkesDevX/compare/v1.1.0...v1.2.0) (2026-10-09)
+
+
+### Added
+
+* **infra:** type-check the services' JavaScript with tsc ([#101](https://github.com/paruff/uFawkesDevX/issues/101)) ([3d4206f](https://github.com/paruff/uFawkesDevX/commit/3d4206f491d73ef6214a7095b6d99c37de318415))
+* **shift-left:** keep this clone's git hooks in step with the hook config ([#105](https://github.com/paruff/uFawkesDevX/issues/105)) ([692dafd](https://github.com/paruff/uFawkesDevX/commit/692dafd94ca370e760888c2be3d30f98fca4cbef))
+
+
+### Fixed
+
+* **changelog:** restore release history; repair issue-form schema ([#113](https://github.com/paruff/uFawkesDevX/issues/113)) ([3500cab](https://github.com/paruff/uFawkesDevX/commit/3500cabaa7c21f4f59c3b713e5eafa8d0dbb5b88))
+* **templates:** replace unrunnable `npm run verify`; drop dangling labels ([#111](https://github.com/paruff/uFawkesDevX/issues/111)) ([d803baf](https://github.com/paruff/uFawkesDevX/commit/d803baf04265cb3c1e577489d5d2ea2db916a02a))
+
+
+### Docs
+
+* **changelog:** add Keep a Changelog header and Unreleased section ([#108](https://github.com/paruff/uFawkesDevX/issues/108)) ([f646809](https://github.com/paruff/uFawkesDevX/commit/f646809ff88e776af3f971e62b89059bec8e6913))
+* **governance:** add CODE_OF_CONDUCT, expand FUNDING.yml ([#107](https://github.com/paruff/uFawkesDevX/issues/107)) ([e297562](https://github.com/paruff/uFawkesDevX/commit/e297562ac67edbe6b5f5111ee1f24cd17fc8faa3))
+* **issue-templates:** add bug_report, feature, security templates ([#110](https://github.com/paruff/uFawkesDevX/issues/110)) ([cd1648b](https://github.com/paruff/uFawkesDevX/commit/cd1648b7a01212b9970e955beb8d2fefd1ad71d5))
+* **pr-template:** add standardized PR template ([#109](https://github.com/paruff/uFawkesDevX/issues/109)) ([190e2df](https://github.com/paruff/uFawkesDevX/commit/190e2dfd808f69fc715510f201a1e8230f6d0725))
+
 ## [Unreleased]
 
 ### Added
