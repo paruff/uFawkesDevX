@@ -363,7 +363,7 @@ Before production deployment:
 
 If you discover a security vulnerability, please report it to:
 
-- Email: security@example.com
+- Email: contact the maintainer via the email on the [paruff GitHub profile](https://github.com/paruff)
 - Do not open public GitHub issues for security vulnerabilities
 
 ## 📄 Compliance

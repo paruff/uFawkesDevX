@@ -10,7 +10,7 @@
 
 ## AI-Assisted Review Block
 
-<!-- REQUIRED. Complete before requesting review. Use Copilot or `/review-agents` to help fill this in. -->
+<!-- REQUIRED. Complete before requesting review. Use Copilot or your AI assistant to help fill this in. -->
 <!-- DORA 2025 (REVIEW-01): Structured review blocks reduce review time by making context explicit. -->
 
 **What does this PR do in one sentence?**
@@ -47,7 +47,7 @@
 
 ## Checklist
 
-- [ ] `pre-commit run --all-files` and `make test-unit` pass (lint + format + tests + artifact-chain)
+- [ ] `pre-commit run --all-files` and `make test-unit` pass (lint + format + tests)
 - [ ] PR is < 400 changed lines, OR `large-pr-approved` label has been applied by a human
 - [ ] No secrets or credentials in any changed file
 - [ ] New features are behind a feature flag (if applicable)
