@@ -92,6 +92,14 @@ Score service validates them and triggers uFawkesPipe builds. See
 
 Eclipse Che has been removed from this platform and replaced by Coder.
 
+## Research basis
+
+- CNCF TAG App Delivery, [_Platforms White Paper_](https://tag-app-delivery.cncf.io/whitepapers/platforms/) (2023): platforms reduce cognitive load so developers focus on business value. Golden paths follow from this.
+- Noda et al., [_DevEx: What Actually Drives Productivity_](https://dl.acm.org/doi/10.1145/3610285) (ACM Queue, 2023): feedback loops, cognitive load and flow state.
+- DORA, [_AI Capabilities Model_](https://dora.dev/ai/capabilities-model/report/) (2025-11-25): quality internal platforms and user-centric focus.
+
+Full findings and sources: [research foundation](https://github.com/paruff/uFawkes.dev/blob/main/docs/research-foundation.md), reviewed quarterly.
+
 ## Design and brand
 
 This repo follows the shared Fawkes and uFawkes design reference:
