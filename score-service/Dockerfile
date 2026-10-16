@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
@@ -24,7 +24,7 @@ RUN npm ci --only=production
 COPY . .
 
 # Create directories
-RUN mkdir -p /app/specs /app/plugins
+RUN mkdir -p /app/specs /app/plugins /data
 
 # Expose ports
 EXPOSE 8081 8082

@@ -110,3 +110,27 @@ test('generateComposeFromSpec runs score-compose and returns the generated manif
   assert.ok(await fs.access(outputPath).then(() => true, () => false));
   assert.match(compose, /nginx:latest/);
 });
+
+test('SQLite store: upsert bumps version, JSON columns round-trip as objects, RETURNING works', async () => {
+  const { initDatabase, query } = freshServerModule({ DATABASE_PATH: ':memory:' });
+  await initDatabase();
+
+  const upsert = `INSERT INTO score_specs (name, spec, status) VALUES (?, ?, 'validated')
+    ON CONFLICT (name) DO UPDATE SET spec = excluded.spec, version = score_specs.version + 1,
+    updated_at = CURRENT_TIMESTAMP, status = 'validated' RETURNING *`;
+  const first = query(upsert, ['web', JSON.stringify({ a: 1 })]).rows[0];
+  const second = query(upsert, ['web', JSON.stringify({ a: 2 })]).rows[0];
+  assert.equal(first.version, 1);
+  assert.equal(second.version, 2);
+  assert.deepEqual(second.spec, { a: 2 });
+
+  const run = query(
+    `INSERT INTO pipeline_runs (workload, action, status, metadata) VALUES (?, ?, 'running', ?) RETURNING *`,
+    ['web', 'deploy', JSON.stringify({ k: 'v' })]
+  ).rows[0];
+  assert.deepEqual(run.metadata, { k: 'v' });
+
+  const deleted = query('DELETE FROM score_specs WHERE name = ? RETURNING *', ['web']).rows;
+  assert.equal(deleted.length, 1);
+  assert.equal(query('SELECT * FROM score_specs WHERE name = ?', ['web']).rows.length, 0);
+});

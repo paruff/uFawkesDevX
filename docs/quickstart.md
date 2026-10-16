@@ -2,24 +2,10 @@
 
 ## 0. Prerequisites
 
-A Postgres instance must already be running on the shared `fawkes-net`
-network, reachable as `postgres:5432`. This used to be
-[uFawkesRes](https://github.com/paruff/uFawkesRes), which is **deprecated**; its
-replacement is not decided yet (#57). Create the `coder` and `backstage`
-databases in that Postgres before running `make up`:
-
-```sql
-CREATE DATABASE coder;
-CREATE USER coder WITH PASSWORD 'changeme';
-GRANT ALL PRIVILEGES ON DATABASE coder TO coder;
-
-CREATE DATABASE backstage;
-CREATE USER backstage WITH PASSWORD 'changeme';
-GRANT ALL PRIVILEGES ON DATABASE backstage TO backstage;
-```
-
-Set matching values in `.env` (`POSTGRES_USER`, `POSTGRES_PASSWORD`,
-`BACKSTAGE_DB_PASSWORD`, `CODER_DB_PASSWORD`).
+No database service is needed (#57): `score-service` and Backstage keep
+SQLite files on Docker volumes, and Coder runs its built-in Postgres. Back up by
+copying the `developerd-score-data`, `developerd-backstage-data` and
+`developerd-coder-home` volumes.
 
 ## 1. Find your Docker GID
 
@@ -84,7 +70,8 @@ steps.
 
 - **Coder stuck on "Connecting..."** — `CODER_ACCESS_URL` is probably set to
   `localhost`. Re-check step 2.
-- **Backstage crash-loops on startup** — the `backstage` database likely
-  doesn't exist yet in the external Postgres. Re-check step 0.
+- **Backstage or Score can't write their database** — check the
+  `developerd-backstage-data` / `developerd-score-data` volumes are mounted and
+  writable by the container user.
 - **Coder can't reach the Docker socket** — `DOCKER_GID` is wrong. Re-run
   `make check-gid` and update `.env`.

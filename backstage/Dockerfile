@@ -12,7 +12,11 @@
 #
 # Multi-stage: build the backend bundle, then run it on a slim runtime image.
 
-FROM node:20-bookworm-slim AS build
+FROM node:24-bookworm-slim AS build
+
+# better-sqlite3 falls back to a source build when no prebuilt binary matches
+RUN apt-get update && apt-get install -y --no-install-recommends python3 g++ make \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY package.json yarn.lock ./
@@ -22,7 +26,7 @@ RUN yarn install --frozen-lockfile --network-timeout 600000
 COPY . .
 RUN yarn build:backend --config app-config.yaml
 
-FROM node:20-bookworm-slim AS runtime
+FROM node:24-bookworm-slim AS runtime
 
 WORKDIR /app
 COPY --from=build /app/packages/backend/dist/bundle.tar.gz .
@@ -34,6 +38,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/*
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
   CMD curl -f http://localhost:7007/healthcheck || exit 1
+
+RUN mkdir -p /data && chown node:node /data
+USER node
 
 EXPOSE 7007
 CMD ["node", "packages/backend", "--config", "app-config.yaml"]

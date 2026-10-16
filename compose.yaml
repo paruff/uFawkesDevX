@@ -22,8 +22,7 @@
 
 # uFawkesDevX compose.yaml — v0.2 (DX-002)
 # Prerequisites:
-#   - An external Postgres reachable as postgres:5432 on fawkes-net (was uFawkesRes, now deprecated; replacement TBD, #57)
-#   - Databases created: "coder" and "backstage" in that Postgres
+#   - No database service: score-service and Backstage use SQLite files on volumes, Coder its built-in Postgres (#57)
 #   - fawkes-net created: `make network`
 #   - DOCKER_GID set in .env (run: `make check-gid`)
 #   - CODER_ACCESS_URL set to a LAN-reachable address in .env (not localhost)
@@ -31,10 +30,10 @@
 services:
   # Coder - Cloud IDE / devcontainer workspace provisioner (replaces Eclipse Che)
   coder:
-    image: ghcr.io/coder/coder:2.34.3
+    image: ghcr.io/coder/coder:v2.34.3
     container_name: developerd-coder
     environment:
-      - CODER_PG_CONNECTION_URL=postgresql://coder:${CODER_DB_PASSWORD}@postgres:5432/coder?sslmode=disable
+      # CODER_PG_CONNECTION_URL deliberately unset: Coder runs its built-in Postgres (#57)
       - CODER_HTTP_ADDRESS=0.0.0.0:7080
       - CODER_ACCESS_URL=${CODER_ACCESS_URL}
       - CODER_TELEMETRY_ENABLE=false
@@ -42,7 +41,8 @@ services:
       - "${DOCKER_GID}" # host docker group GID — set via `make check-gid`
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - coder-home:/home/coder/.config
+      # Mount /home/coder (not .config): the volume inherits the coder user's ownership; a root-owned mount fails with 'mkdir coderv2: permission denied'
+      - coder-home:/home/coder
     ports:
       - "${CODER_PORT:-7080}:7080"
     networks:
@@ -65,14 +65,9 @@ services:
       - NODE_ENV=${NODE_ENV:-development}
       - APP_BASE_URL=${APP_BASE_URL:-http://localhost:7007}
       - BACKEND_BASE_URL=${BACKEND_BASE_URL:-http://localhost:7007}
-      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
-      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
-      - POSTGRES_USER=${POSTGRES_USER:-backstage}
-      - POSTGRES_DB=${POSTGRES_DB:-backstage}
       - AUTH_PROVIDER=local
-    secrets:
-      - backstage_db_password
     volumes:
+      - backstage-data:/data
       - ./backstage/catalog:/app/catalog:ro
       - backstage-plugins:/app/plugins
     ports:
@@ -99,12 +94,13 @@ services:
     environment:
       - API_PORT=8081
       - WEBHOOK_PORT=8082
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/score
+      - DATABASE_PATH=/data/score.db
       - PIPELINE_TRIGGER_ENABLED=${PIPELINE_TRIGGER_ENABLED:-true}
       - PIPELINE_WEBHOOK_URL=${PIPELINE_WEBHOOK_URL:-}
       - AUTH_PROVIDER=local
       - LOG_LEVEL=${LOG_LEVEL:-info}
     volumes:
+      - score-data:/data
       - score-specs:/app/specs
       - score-plugins:/app/plugins
       - ./score-service/config:/app/config:ro
@@ -158,10 +154,6 @@ services:
       retries: 3
     restart: unless-stopped
 
-secrets:
-  backstage_db_password:
-    environment: BACKSTAGE_DB_PASSWORD
-
 networks:
   fawkes-net:
     external: true
@@ -170,8 +162,12 @@ networks:
 volumes:
   coder-home:
     name: developerd-coder-home
+  backstage-data:
+    name: developerd-backstage-data
   backstage-plugins:
     name: developerd-backstage-plugins
+  score-data:
+    name: developerd-score-data
   score-specs:
     name: developerd-score-specs
   score-plugins:

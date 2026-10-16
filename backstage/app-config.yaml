@@ -37,18 +37,12 @@ backend:
     origin: ${APP_BASE_URL}
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
+  # SQLite, one file per plugin on the backstage-data volume (#57). Single
+  # instance only; back up by copying the volume.
   database:
-    client: pg
+    client: better-sqlite3
     connection:
-      host: ${POSTGRES_HOST}
-      port: ${POSTGRES_PORT}
-      user: ${POSTGRES_USER}
-      # DX-002: password comes from the backstage_db_password Docker secret,
-      # not a plain env var. Backstage's config loader supports $file to
-      # read a value from a file at load time.
-      password:
-        $file: /run/secrets/backstage_db_password
-      database: ${POSTGRES_DB}
+      directory: /data
 
 # Local authentication configuration
 auth:
