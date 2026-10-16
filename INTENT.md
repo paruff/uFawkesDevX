@@ -10,13 +10,10 @@ Docker Compose stack that gives developers:
 
 ## The one thing to know
 
-**This stack does not run its own database, and its old database provider is
-gone.** Coder, Backstage, and the Score service connect to an external
-Postgres at `postgres:5432` on the `fawkes-net` network (see `compose.yaml`).
-That used to be uFawkesRes, which is **deprecated**. What replaces it is
-undecided (#57, suite plan AC-DEVX-01). Until that's settled, `make up` works
-only if you supply that Postgres yourself. The quickstart also doesn't yet
-create the `score` database that `score-service` connects to.
+**This stack runs no separate database service.** `score-service` and
+Backstage use SQLite on named volumes; Coder uses its built-in Postgres
+(see [ADR-0001](docs/adr/0001-no-separate-database-service.md)). The old
+shared provider, uFawkesRes, is archived and is not needed.
 
 ## Where this sits in the suite
 
@@ -30,15 +27,15 @@ create the `score` database that `score-service` connects to.
 
 The suite release plan is at
 [uFawkes.dev `docs/ai-sdlc/suite-release/`](https://github.com/paruff/uFawkes.dev/tree/main/docs/ai-sdlc/suite-release).
-This repo's first release, `v0.1.0`, is Phase 3 of that plan. It's gated on
+This repo's first release, `v0.1.0`, is Phase 5 of that plan. It's gated on
 AC-DEVX-01: running without uFawkesRes.
 
 ## What "done" means here
 
 - **Planning follows the uFawkesAI artifact chain:**
   `docs/ai-sdlc/<feature>/intent.md` → `spec.md` (requirements and design) →
-  `plan.md`. The root `specification.md`, `design.md`, and `plan.md` are
-  pre-convention; they move into `docs/ai-sdlc/v0.1.0/` in Phase 3.
+  `plan.md`. The pre-convention `specification.md`, `design.md`, and `plan.md` now live in
+  `docs/ai-sdlc/v0.1.0/`.
 - **A setup step is described only after it has been run for real** against
   the documented prerequisites.
 - **Work goes through PRs.** Changes to `compose.yaml` service structure or

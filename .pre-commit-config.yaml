@@ -6,8 +6,8 @@
 # Run: pre-commit run --all-files
 
 
-exclude: |
-  ^graphify-out/|^\.opencode/|^\.serena/|^\.agents/logs/|^\.claude/worktrees/
+exclude: |-
+  ^graphify-out/|^\.opencode/|^\.serena/|^\.agents/logs/|^\.claude/worktrees/|^backstage/(\.yarn/|packages/|yarn\.lock|\.yarnrc\.yml|\.eslintrc\.js|\.eslintignore|\.prettierignore|\.gitignore|backstage\.json|package\.json|tsconfig\.json|playwright\.config\.ts)
 
 # One `pre-commit install` sets up every stage below (commit-msg and pre-push
 # hooks are defined but only run if they are installed).

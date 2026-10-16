@@ -102,7 +102,7 @@ class TestDockerComposeValidation:
         )
 
     def test_fawkes_net_is_external(self, docker_compose_config):
-        """DX-002: fawkes-net is an external network shared with uFawkesRes/uFawkesSec."""
+        """DX-002: fawkes-net is an external network shared with the other uFawkes planes."""
         networks = docker_compose_config.get("networks", {})
         assert "fawkes-net" in networks, "Missing 'fawkes-net' network"
         assert networks["fawkes-net"].get("external") is True, (

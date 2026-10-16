@@ -30,7 +30,7 @@
 | Service | Image | Port | Healthcheck | Profile |
 |---|---|---|---|---|
 | **Gateway** | `nginx:1.27-alpine` | 8000 | `nginx -t` | core |
-| **Backstage** | Custom build (Node) | 7007 | `curl -f http://localhost:7007/healthcheck` | core |
+| **Backstage** | Custom build (Node) | 7007 | `curl -f http://localhost:7007/.backstage/health/v1/liveness` | core |
 | **Score Service** | Custom build (Node) | 8081 (API), 8082 (webhooks) | `node healthcheck.js` (in Dockerfile) | core |
 | **Plugin Manager** | Custom build (Node) | 8083 | `node healthcheck.js` (in Dockerfile) | core |
 | **Coder** | `ghcr.io/coder/coder:2.34.3` | 7080 | `curl -f http://localhost:7080/healthz` | core |
@@ -115,7 +115,7 @@ make health         # check all services report healthy
 | Service | Check Command | Expected | Timeout |
 |---|---|---|---|
 | Gateway | `curl -f http://localhost:8000/health` | 200 OK | 5s |
-| Backstage | `curl -f http://localhost:7007/healthcheck` | 200 OK | 10s |
+| Backstage | `curl -f http://localhost:7007/.backstage/health/v1/liveness` | 200 OK | 10s |
 | Score API | `curl -f http://localhost:8081/health` | 200 OK | 5s |
 | Score Webhooks | `curl -f http://localhost:8082/health` | 200 OK | 5s |
 | Plugin Manager | `curl -f http://localhost:8083/health` | 200 OK | 5s |

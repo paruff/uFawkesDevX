@@ -23,7 +23,7 @@
 
 | ID | Requirement | Discovery Ref | Acceptance Criterion | Test Type |
 |---|---|---|---|---|
-| FR-2.1 | Backstage serves on `http://localhost:7007` (configurable via `BACKSTAGE_PORT`) | JTBD: Single Pane | `curl -f http://localhost:7007/healthcheck` returns 200 | Live-System |
+| FR-2.1 | Backstage serves on `http://localhost:7007` (configurable via `BACKSTAGE_PORT`) | JTBD: Single Pane | `curl -f http://localhost:7007/.backstage/health/v1/liveness` returns 200 | Live-System |
 | FR-2.2 | Software Catalog contains entities for all 5 platform services + 3 example workloads | JTBD: Catalog Utility | `curl -s http://localhost:7007/api/catalog/entities \| jq '.items \| length'` ≥ 8 | Live-System |
 | FR-2.3 | Each catalog entity has: `metadata.name`, `spec.type`, `spec.lifecycle`, `spec.owner`, `spec.system` | JTBD: Catalog Utility | Schema validation passes for all entities | Contract |
 | FR-2.4 | TechDocs builds and serves documentation for all catalog entities | JTBD: Catalog Utility | `curl -f http://localhost:7007/docs/<entity>/` returns HTML | Integration |

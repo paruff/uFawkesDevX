@@ -1,4 +1,4 @@
-.PHONY: help start stop restart logs build clean health status install test test-unit test-integration test-smoke test-acceptance validate pre-commit-setup pre-commit-run network check-gid up down coder-push-template doctor
+.PHONY: help start stop restart logs build clean health status install test test-unit test-integration test-smoke test-acceptance validate pre-commit-setup pre-commit-run network check-gid up down coder-push-template doctor backstage-bundle dev
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -18,12 +18,18 @@ network: ## Create the external fawkes-net Docker network (shared with other uFa
 check-gid: ## Print the host docker.sock group GID for DOCKER_GID in .env
 	@stat -c '%g' /var/run/docker.sock 2>/dev/null || stat -f '%g' /var/run/docker.sock
 
-start: network ## Start all services
+backstage-bundle: ## Build the Backstage backend bundle on the host (needs Node 22 or 24; skipped if present)
+	@test -f backstage/packages/backend/dist/bundle.tar.gz || ( cd backstage && node .yarn/releases/yarn-4.13.0.cjs install --immutable && node .yarn/releases/yarn-4.13.0.cjs tsc && node .yarn/releases/yarn-4.13.0.cjs build:backend )
+
+start: network backstage-bundle ## Start all services
 	@echo "Starting Developer Control Plane..."
 	@grep -q localhost .env 2>/dev/null && echo "WARNING: CODER_ACCESS_URL must not be localhost" || true
-	docker compose up -d
+	docker compose -f compose.yaml up -d
 	@echo "Services starting... Use 'make status' to check progress"
 	@echo "Access the platform at http://localhost:8000"
+
+dev: network backstage-bundle ## Start with compose.override.yaml (source mounts; needs `npm install` in score-service and plugin-manager)
+	docker compose up -d
 
 up: start ## Alias for 'start' (matches compose.yaml usage docs)
 

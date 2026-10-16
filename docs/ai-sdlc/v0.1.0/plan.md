@@ -1,11 +1,10 @@
 # uFawkesDevX — Implementation Plan v0.2
 
-> **Historical note (2026-09-27):** uFawkesRes, referenced below as the
-> Postgres/Valkey provider, is **deprecated**, and uFawkesSec has merged into
-> uFawkesPipe. What replaces uFawkesRes's Postgres is not decided yet (#57,
-> suite plan AC-DEVX-01). This file moves to `docs/ai-sdlc/v0.1.0/` in the
-> suite plan's Phase 3; until then, treat its uFawkesRes/uFawkesSec mentions
-> as historical.
+> **Historical note (2026-10-16):** uFawkesRes is archived. This file's
+> external-Postgres design was superseded by
+> [ADR-0001](../../adr/0001-no-separate-database-service.md): SQLite for
+> `score-service` and Backstage, Coder's built-in Postgres. Treat the
+> uFawkesRes and uFawkesSec mentions below as historical.
 
 _Lean issues for Deepseek v4 flash implementation_
 
@@ -467,3 +466,23 @@ DX-001
 7. **The `score-compose` binary name may have changed.** The project was active
    as of mid-2025 but the binary and repository name are subject to change.
    Always fetch the releases page before writing the Dockerfile install command.
+
+## Verification Strategy
+
+**Traces to:** AC-DEVX-01 (suite release plan, Phase 5), uFawkesDevX#81.
+
+| Check | How | Result (2026-10-16) |
+| --- | --- | --- |
+| The #57 decision is recorded | `docs/adr/0001-no-separate-database-service.md` | Present |
+| `make up` brings up Coder and Backstage with no external database | `docker compose down -v && make up && make health`, transcript in [`clean-host-run.txt`](clean-host-run.log) | All five services `healthy`; gateway, Backstage and Coder endpoints return 200 |
+| Compose, catalog and docs stay consistent | `python -m pytest tests/unit` | 70 passed |
+| `score-service` stores and reads specs | `npm test` in `score-service/` | 4 passed, 1 skipped |
+| No uFawkesRes references remain in live docs | `grep -ri ufawkesres` over `docs/CONTRACTS.md`, `INTENT.md`, `backstage/catalog/` | None (history notes only) |
+
+Setup the run depends on, found by the run itself:
+
+- `make up` runs `make backstage-bundle`, which builds the Backstage backend on the host (Node 22 or 24). The full install is too heavy to run inside a small Docker VM.
+- `make up` uses `compose.yaml` only. `compose.override.yaml` needs a local `npm install` first, so it moved behind `make dev`.
+- `plugin-manager/package-lock.json` was missing, so `npm ci` failed. It is committed now.
+- The gateway listened on port 80 while compose publishes 8000. `nginx.conf` now listens on 8000.
+- `DOCKER_GID` must be the docker socket's group inside the Docker VM. On Colima and Docker Desktop, `make check-gid` reads the host and returns nothing.
