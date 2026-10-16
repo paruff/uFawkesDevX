@@ -22,8 +22,7 @@
 
 # uFawkesDevX compose.yaml — v0.2 (DX-002)
 # Prerequisites:
-#   - Backstage only: an external Postgres reachable as postgres:5432 on fawkes-net (uFawkesRes is deprecated; Backstage moves to SQLite, #57). score-service uses SQLite, Coder its built-in Postgres.
-#   - Database created: "backstage" in that Postgres
+#   - No database service: score-service and Backstage use SQLite files on volumes, Coder its built-in Postgres (#57)
 #   - fawkes-net created: `make network`
 #   - DOCKER_GID set in .env (run: `make check-gid`)
 #   - CODER_ACCESS_URL set to a LAN-reachable address in .env (not localhost)
@@ -66,14 +65,9 @@ services:
       - NODE_ENV=${NODE_ENV:-development}
       - APP_BASE_URL=${APP_BASE_URL:-http://localhost:7007}
       - BACKEND_BASE_URL=${BACKEND_BASE_URL:-http://localhost:7007}
-      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
-      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
-      - POSTGRES_USER=${POSTGRES_USER:-backstage}
-      - POSTGRES_DB=${POSTGRES_DB:-backstage}
       - AUTH_PROVIDER=local
-    secrets:
-      - backstage_db_password
     volumes:
+      - backstage-data:/data
       - ./backstage/catalog:/app/catalog:ro
       - backstage-plugins:/app/plugins
     ports:
@@ -160,10 +154,6 @@ services:
       retries: 3
     restart: unless-stopped
 
-secrets:
-  backstage_db_password:
-    environment: BACKSTAGE_DB_PASSWORD
-
 networks:
   fawkes-net:
     external: true
@@ -172,6 +162,8 @@ networks:
 volumes:
   coder-home:
     name: developerd-coder-home
+  backstage-data:
+    name: developerd-backstage-data
   backstage-plugins:
     name: developerd-backstage-plugins
   score-data:
