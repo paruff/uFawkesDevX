@@ -352,6 +352,22 @@ repos:
         exclude: \.test\.js$
 
   # ============================================================================
+  # Type-check Python (shift-left spec R2, decided 2026-10-06). Non-strict.
+  # Runs in an isolated env without the project's dependencies, so unresolved
+  # imports are ignored (mypy.ini) and only type stubs are installed. Scope is
+  # tests/ and other real Python; templates/ holds cookiecutter files whose
+  # {{ }} placeholders are not valid Python.
+  # ============================================================================
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.4.0
+    hooks:
+      - id: mypy
+        name: Type-check Python (mypy)
+        args: ["--config-file=mypy.ini"]
+        additional_dependencies: ["types-PyYAML", "types-requests"]
+        exclude: ^templates/
+
+  # ============================================================================
   # Shared shift-left hooks from uFawkesPipe (keep last: the stamps record that
   # every hook above ran). Tools that aren't hooks run through scripts/shift-left.sh.
   # ============================================================================
