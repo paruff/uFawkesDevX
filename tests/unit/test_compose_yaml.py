@@ -116,7 +116,7 @@ class TestDockerComposeValidation:
     def test_coder_image_is_pinned(self, docker_compose_config):
         """DX-002: coder image is pinned to 2.34.3, not :latest."""
         coder = docker_compose_config["services"]["coder"]
-        assert coder["image"] == "ghcr.io/coder/coder:2.34.3"
+        assert coder["image"] == "ghcr.io/coder/coder:v2.34.3"
 
     def test_coder_mounts_docker_socket(self, docker_compose_config):
         """DX-002: coder needs the host docker socket to provision workspaces."""
