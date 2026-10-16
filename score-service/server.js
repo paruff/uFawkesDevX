@@ -2,8 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
-const { Pool } = require('pg');
-const Ajv = require('ajv');
+const { DatabaseSync } = require('node:sqlite');
+const Ajv = require('ajv').default;
 const YAML = require('yaml');
 const fs = require('fs').promises;
 const path = require('path');
@@ -37,10 +37,28 @@ const PLUGINS_DIR = process.env.PLUGINS_DIR || '/app/plugins';
 // confirmed upstream.
 const PIPELINE_WEBHOOK_URL = process.env.PIPELINE_WEBHOOK_URL || '';
 
-// Database connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+// Database: a SQLite file on a volume (single writer, file-copy backups).
+// Opened in initDatabase() so requiring this module has no side effects.
+const DATABASE_PATH = process.env.DATABASE_PATH || '/data/score.db';
+const JSON_COLUMNS = ['spec', 'metadata'];
+let db;
+
+// Minimal pg-shaped helper: returns { rows } and parses the JSON TEXT columns
+// that Postgres used to return as objects (JSONB).
+function query(sql, params = []) {
+  const stmt = db.prepare(sql);
+  if (!/^\s*select|\breturning\b/i.test(sql)) {
+    stmt.run(...params);
+    return { rows: [] };
+  }
+  const rows = stmt.all(...params).map((row) => {
+    for (const col of JSON_COLUMNS) {
+      if (typeof row[col] === 'string') row[col] = JSON.parse(row[col]);
+    }
+    return row;
+  });
+  return { rows };
+}
 
 // JSON Schema validator for Score specs
 const ajv = new Ajv();
@@ -116,36 +134,29 @@ async function loadPlugins() {
 
 // Initialize database
 async function initDatabase() {
-  const client = await pool.connect();
-  try {
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS score_specs (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) UNIQUE NOT NULL,
-        spec JSONB NOT NULL,
-        version INTEGER DEFAULT 1,
-        status VARCHAR(50) DEFAULT 'pending',
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-      );
-    `);
-
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS pipeline_runs (
-        id SERIAL PRIMARY KEY,
-        workload VARCHAR(255) NOT NULL,
-        action VARCHAR(50) NOT NULL,
-        status VARCHAR(50) DEFAULT 'pending',
-        metadata JSONB,
-        created_at TIMESTAMP DEFAULT NOW(),
-        completed_at TIMESTAMP
-      );
-    `);
-
-    console.log('Database initialized');
-  } finally {
-    client.release();
-  }
+  db = new DatabaseSync(DATABASE_PATH);
+  db.exec('PRAGMA journal_mode = WAL');
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS score_specs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE NOT NULL,
+      spec TEXT NOT NULL,
+      version INTEGER DEFAULT 1,
+      status TEXT DEFAULT 'pending',
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS pipeline_runs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      workload TEXT NOT NULL,
+      action TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
+      metadata TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      completed_at TEXT
+    );
+  `);
+  console.log('Database initialized');
 }
 
 // score-compose integration (DX-003)
@@ -220,8 +231,8 @@ apiApp.get('/health', (req, res) => {
 // List all Score specs
 apiApp.get('/api/v1/specs', async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT id, name, version, status, created_at, updated_at FROM score_specs ORDER BY created_at DESC'
+    const result = await query(
+      'SELECT id, name, version, status, created_at, updated_at FROM score_specs ORDER BY created_at DESC, id DESC'
     );
     res.json({ specs: result.rows });
   } catch (error) {
@@ -234,8 +245,8 @@ apiApp.get('/api/v1/specs', async (req, res) => {
 apiApp.get('/api/v1/specs/:name', async (req, res) => {
   try {
     const { name } = req.params;
-    const result = await pool.query(
-      'SELECT * FROM score_specs WHERE name = $1',
+    const result = await query(
+      'SELECT * FROM score_specs WHERE name = ?',
       [name]
     );
 
@@ -264,7 +275,7 @@ apiApp.post('/api/v1/specs', async (req, res) => {
       });
     }
 
-    const name = spec.metadata.name;
+    const name = /** @type {any} */ (spec).metadata.name;
 
     // Validate name to prevent path traversal
     if (!/^[a-z0-9-]+$/.test(name)) {
@@ -287,11 +298,11 @@ apiApp.post('/api/v1/specs', async (req, res) => {
     }
 
     // Save spec to database
-    const result = await pool.query(
+    const result = await query(
       `INSERT INTO score_specs (name, spec, status)
-       VALUES ($1, $2, 'validated')
+       VALUES (?, ?, 'validated')
        ON CONFLICT (name)
-       DO UPDATE SET spec = $2, version = score_specs.version + 1, updated_at = NOW(), status = 'validated'
+       DO UPDATE SET spec = excluded.spec, version = score_specs.version + 1, updated_at = CURRENT_TIMESTAMP, status = 'validated'
        RETURNING *`,
       [name, JSON.stringify(spec)]
     );
@@ -325,8 +336,8 @@ apiApp.post('/api/v1/specs', async (req, res) => {
 apiApp.delete('/api/v1/specs/:name', async (req, res) => {
   try {
     const { name } = req.params;
-    const result = await pool.query(
-      'DELETE FROM score_specs WHERE name = $1 RETURNING *',
+    const result = await query(
+      'DELETE FROM score_specs WHERE name = ? RETURNING *',
       [name]
     );
 
@@ -352,8 +363,8 @@ apiApp.delete('/api/v1/specs/:name', async (req, res) => {
 // List pipeline runs
 apiApp.get('/api/v1/pipelines', async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT * FROM pipeline_runs ORDER BY created_at DESC LIMIT 100'
+    const result = await query(
+      'SELECT * FROM pipeline_runs ORDER BY created_at DESC, id DESC LIMIT 100'
     );
     res.json({ pipelines: result.rows });
   } catch (error) {
@@ -366,8 +377,8 @@ apiApp.get('/api/v1/pipelines', async (req, res) => {
 apiApp.get('/api/v1/pipelines/:workload', async (req, res) => {
   try {
     const { workload } = req.params;
-    const result = await pool.query(
-      'SELECT * FROM pipeline_runs WHERE workload = $1 ORDER BY created_at DESC',
+    const result = await query(
+      'SELECT * FROM pipeline_runs WHERE workload = ? ORDER BY created_at DESC, id DESC',
       [workload]
     );
     res.json({ pipelines: result.rows });
@@ -394,9 +405,9 @@ webhookApp.post('/webhooks/pipeline/trigger', async (req, res) => {
     }
 
     // Create pipeline run
-    const result = await pool.query(
+    const result = await query(
       `INSERT INTO pipeline_runs (workload, action, status, metadata)
-       VALUES ($1, $2, 'running', $3)
+       VALUES (?, ?, 'running', ?)
        RETURNING *`,
       [workload, action, JSON.stringify(metadata || {})]
     );
@@ -417,16 +428,16 @@ webhookApp.post('/webhooks/pipeline/trigger', async (req, res) => {
     // Simulate pipeline execution (in real implementation, this would trigger actual pipeline)
     setTimeout(async () => {
       try {
-        await pool.query(
-          `UPDATE pipeline_runs SET status = 'completed', completed_at = NOW() WHERE id = $1`,
+        await query(
+          `UPDATE pipeline_runs SET status = 'completed', completed_at = CURRENT_TIMESTAMP WHERE id = ?`,
           [pipelineRun.id]
         );
       } catch (error) {
         console.error('Failed to update pipeline status:', error);
         // Attempt to mark as failed
         try {
-          await pool.query(
-            `UPDATE pipeline_runs SET status = 'failed', completed_at = NOW() WHERE id = $1`,
+          await query(
+            `UPDATE pipeline_runs SET status = 'failed', completed_at = CURRENT_TIMESTAMP WHERE id = ?`,
             [pipelineRun.id]
           );
         } catch (updateError) {
@@ -518,4 +529,4 @@ if (require.main === module) {
   start();
 }
 
-module.exports = { generateComposeFromSpec, triggerPipelineWebhook };
+module.exports = { generateComposeFromSpec, triggerPipelineWebhook, initDatabase, query };

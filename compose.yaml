@@ -22,8 +22,8 @@
 
 # uFawkesDevX compose.yaml — v0.2 (DX-002)
 # Prerequisites:
-#   - An external Postgres reachable as postgres:5432 on fawkes-net (was uFawkesRes, now deprecated; replacement TBD, #57)
-#   - Databases created: "coder" and "backstage" in that Postgres
+#   - Backstage only: an external Postgres reachable as postgres:5432 on fawkes-net (uFawkesRes is deprecated; Backstage moves to SQLite, #57). score-service uses SQLite, Coder its built-in Postgres.
+#   - Database created: "backstage" in that Postgres
 #   - fawkes-net created: `make network`
 #   - DOCKER_GID set in .env (run: `make check-gid`)
 #   - CODER_ACCESS_URL set to a LAN-reachable address in .env (not localhost)
@@ -34,7 +34,7 @@ services:
     image: ghcr.io/coder/coder:2.34.3
     container_name: developerd-coder
     environment:
-      - CODER_PG_CONNECTION_URL=postgresql://coder:${CODER_DB_PASSWORD}@postgres:5432/coder?sslmode=disable
+      # CODER_PG_CONNECTION_URL deliberately unset: Coder runs its built-in Postgres (#57)
       - CODER_HTTP_ADDRESS=0.0.0.0:7080
       - CODER_ACCESS_URL=${CODER_ACCESS_URL}
       - CODER_TELEMETRY_ENABLE=false
@@ -42,7 +42,8 @@ services:
       - "${DOCKER_GID}" # host docker group GID — set via `make check-gid`
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - coder-home:/home/coder/.config
+      # Mount /home/coder (not .config): the volume inherits the coder user's ownership; a root-owned mount fails with 'mkdir coderv2: permission denied'
+      - coder-home:/home/coder
     ports:
       - "${CODER_PORT:-7080}:7080"
     networks:
@@ -99,12 +100,13 @@ services:
     environment:
       - API_PORT=8081
       - WEBHOOK_PORT=8082
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/score
+      - DATABASE_PATH=/data/score.db
       - PIPELINE_TRIGGER_ENABLED=${PIPELINE_TRIGGER_ENABLED:-true}
       - PIPELINE_WEBHOOK_URL=${PIPELINE_WEBHOOK_URL:-}
       - AUTH_PROVIDER=local
       - LOG_LEVEL=${LOG_LEVEL:-info}
     volumes:
+      - score-data:/data
       - score-specs:/app/specs
       - score-plugins:/app/plugins
       - ./score-service/config:/app/config:ro
@@ -172,6 +174,8 @@ volumes:
     name: developerd-coder-home
   backstage-plugins:
     name: developerd-backstage-plugins
+  score-data:
+    name: developerd-score-data
   score-specs:
     name: developerd-score-specs
   score-plugins:
