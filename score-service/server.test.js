@@ -135,26 +135,19 @@ test('SQLite store: upsert bumps version, JSON columns round-trip as objects, RE
   assert.equal(query('SELECT * FROM score_specs WHERE name = ?', ['web']).rows.length, 0);
 });
 
-test('loadPlugins ignores plugin filenames that resolve outside the plugins directory', async () => {
-  const { loadPlugins } = freshServerModule({
-    PLUGINS_DIR: '/tmp/score-plugins-test',
-  });
+test('loadPlugins ignores symlinked plugins that resolve outside the plugins directory', async () => {
+  const pluginsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'score-plugins-'));
+  const externalTarget = path.join(await fs.mkdtemp(path.join(os.tmpdir(), 'score-external-')), 'outside.js');
+  const goodPath = path.join(pluginsDir, 'good.js');
+  const symlinkPath = path.join(pluginsDir, 'outside.js');
 
-  const pluginsDir = '/tmp/score-plugins-test';
-  const privilegedDir = '/tmp';
-  await fs.mkdir(pluginsDir, { recursive: true });
-  await fs.mkdir(privilegedDir, { recursive: true });
+  await fs.writeFile(externalTarget, 'module.exports = { name: "outside", validateSpec: () => ({ valid: true }) };');
+  await fs.writeFile(goodPath, 'module.exports = { name: "good", validateSpec: () => ({ valid: true }) };');
+  await fs.symlink(externalTarget, symlinkPath);
 
-  const pluginPath = path.join(pluginsDir, 'good.js');
-  await fs.writeFile(pluginPath, 'module.exports = { name: "good", validateSpec: () => ({ valid: true }) };');
-
-  const escapeName = '../escape.js';
-  const escapePath = path.join(pluginsDir, escapeName);
-  await fs.writeFile(escapePath, 'module.exports = { name: "escape", validateSpec: () => ({ valid: true }) };');
-
+  const { plugins, loadPlugins } = freshServerModule({ PLUGINS_DIR: pluginsDir });
   await loadPlugins();
 
-  assert.ok((await fs.readFile(pluginPath, 'utf8')).includes('good'));
-  const pluginNames = Array.from(require.cache[require.resolve('./server.js')].exports || {}).map(([name]) => name);
-  assert.ok(!pluginNames.includes('escape'));
+  assert.ok(plugins.has('good'));
+  assert.equal(plugins.has('outside'), false);
 });

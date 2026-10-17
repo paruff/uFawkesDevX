@@ -43,8 +43,12 @@ const DATABASE_PATH = process.env.DATABASE_PATH || '/data/score.db';
 const JSON_COLUMNS = ['spec', 'metadata'];
 let db;
 
-function isPathWithinDir(targetPath, baseDir) {
-  const relative = path.relative(baseDir, targetPath);
+async function isPathWithinDir(targetPath, baseDir) {
+  const [resolvedTarget, resolvedBase] = await Promise.all([
+    fs.realpath(targetPath).catch(() => path.resolve(targetPath)),
+    fs.realpath(baseDir).catch(() => path.resolve(baseDir)),
+  ]);
+  const relative = path.relative(resolvedBase, resolvedTarget);
   return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
@@ -115,7 +119,7 @@ async function loadPlugins() {
         // path is reached through a symlinked parent or a nested path.
         const resolvedPath = path.resolve(pluginPath);
         const resolvedPluginDir = path.resolve(PLUGINS_DIR);
-        if (!isPathWithinDir(resolvedPath, resolvedPluginDir)) {
+        if (!(await isPathWithinDir(resolvedPath, resolvedPluginDir))) {
           console.warn(`Skipping plugin outside plugins directory: ${file}`);
           continue;
         }
@@ -542,4 +546,5 @@ module.exports = {
   query,
   loadPlugins,
   isPathWithinDir,
+  plugins,
 };
