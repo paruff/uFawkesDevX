@@ -1,4 +1,4 @@
-.PHONY: help start stop restart logs build clean health status install test test-unit test-integration test-smoke test-acceptance validate pre-commit-setup pre-commit-run network check-gid up down coder-push-template doctor backstage-bundle dev
+.PHONY: test-quiet help start stop restart logs build clean health status install test test-unit test-integration test-smoke test-acceptance validate pre-commit-setup pre-commit-run network check-gid up down coder-push-template doctor backstage-bundle dev
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -101,6 +101,9 @@ test: test-unit ## Run all tests
 
 test-unit: ## Run unit tests
 	pytest tests/unit/ -v --tb=short
+
+test-quiet: ## Run unit tests, printing failures only
+	pytest tests/unit/ -q --tb=short
 
 test-integration: ## Run integration tests (requires Docker)
 	pytest tests/integration/ -v --tb=short
