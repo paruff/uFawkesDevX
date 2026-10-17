@@ -1,0 +1,27 @@
+# Accepted findings in backstage/yarn.lock (transitive dependencies of the
+# scaffolded Backstage app). Each one either has no fixed version or needs a
+# major bump that Backstage's own packages do not support yet. They expire on
+# the date shown so they come back for review. Tracked in docs/KNOWN_LIMITATIONS.md.
+# Fix path: `backstage-cli versions:bump` when Backstage ships updated dependencies.
+#
+# Fixed by a same-major pin in backstage/package.json "resolutions", not ignored:
+# tar (GHSA-23hp-3jrh-7fpw and others), undici 7.29.1, adm-zip 0.6.1.
+
+# No fixed version available
+CVE-2026-93687 exp:2027-01-15
+CVE-2026-85393 exp:2027-01-15
+
+# Fix needs a major version bump of a package Backstage pins
+CVE-2026-104852 exp:2027-01-15
+CVE-2026-102990 exp:2027-01-15
+CVE-2025-25288 exp:2027-01-15
+CVE-2025-25289 exp:2027-01-15
+CVE-2025-25290 exp:2027-01-15
+CVE-2026-31808 exp:2027-01-15
+CVE-2026-104844 exp:2027-01-15
+CVE-2026-53666 exp:2027-01-15
+CVE-2026-53669 exp:2027-01-15
+CVE-2026-41907 exp:2027-01-15
+
+# Fix needs a minor bump of prismjs that react-syntax-highlighter (refractor) pins at ~1.27
+CVE-2024-53382 exp:2027-01-15
