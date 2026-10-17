@@ -474,7 +474,7 @@ DX-001
 | Check | How | Result (2026-10-16) |
 | --- | --- | --- |
 | The #57 decision is recorded | `docs/adr/0001-no-separate-database-service.md` | Present |
-| `make up` brings up Coder and Backstage with no external database | `docker compose down -v && make up && make health`, transcript in [`clean-host-run.txt`](clean-host-run.log) | All five services `healthy`; gateway, Backstage and Coder endpoints return 200 |
+| `make up` brings up Coder and Backstage with no external database | `docker compose down -v && make up && make health`, transcript in [`clean-host-run.txt`](clean-host-run.txt) | All five services `healthy`; gateway, Backstage and Coder endpoints return 200 |
 | Compose, catalog and docs stay consistent | `python -m pytest tests/unit` | 70 passed |
 | `score-service` stores and reads specs | `npm test` in `score-service/` | 4 passed, 1 skipped |
 | No uFawkesRes references remain in live docs | `grep -ri ufawkesres` over `docs/CONTRACTS.md`, `INTENT.md`, `backstage/catalog/` | None (history notes only) |

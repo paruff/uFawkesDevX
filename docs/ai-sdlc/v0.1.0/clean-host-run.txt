@@ -1,14 +1,14 @@
-# Clean-host run 2026-10-16T23:52:24Z — docker compose down -v && make up && make health (Colima, Docker 29.9.1, Compose 5.6.0, buildx 0.38.0)
- Container developerd-gateway Stopping
+# Clean-host run 2026-10-17T10:59:37Z @ 935160b+Makefile --wait — docker compose down -v && make up && make health (Docker version 29.9.1, build dfc520dcc2, Docker Compose version 5.6.0)
  Container developerd-plugin-manager Stopping
  Container developerd-coder Stopping
+ Container developerd-gateway Stopping
  Container developerd-gateway Stopped
  Container developerd-gateway Removing
- Container developerd-coder Stopped
- Container developerd-coder Removing
  Container developerd-gateway Removed
  Container developerd-backstage Stopping
  Container developerd-score Stopping
+ Container developerd-coder Stopped
+ Container developerd-coder Removing
  Container developerd-coder Removed
  Container developerd-backstage Stopped
  Container developerd-backstage Removing
@@ -19,45 +19,41 @@
  Container developerd-score Stopped
  Container developerd-score Removing
  Container developerd-score Removed
+ Volume developerd-score-specs Removing
+ Volume developerd-coder-home Removing
  Volume developerd-score-plugins Removing
  Volume developerd-plugin-registry Removing
  Volume developerd-backstage-data Removing
- Volume developerd-backstage-plugins Removing
- Volume developerd-coder-home Removing
  Volume developerd-score-data Removing
- Volume developerd-score-specs Removing
- Volume developerd-score-plugins Removed
- Volume developerd-plugin-registry Removed
+ Volume developerd-backstage-plugins Removing
  Volume developerd-score-specs Removed
+ Volume developerd-plugin-registry Removed
  Volume developerd-coder-home Removed
- Volume developerd-backstage-plugins Removed
- Volume developerd-backstage-data Removed
+ Volume developerd-score-plugins Removed
  Volume developerd-score-data Removed
-#19 DONE 7181.8s
-
-#20 resolving provenance for metadata file
-#20 DONE 0.2s
- Image ufawkesdevx-backstage Built
-docker network inspect fawkes-net >/dev/null 2>&1 || docker network create fawkes-net
+ Volume developerd-backstage-data Removed
+ Volume developerd-backstage-plugins Removed
+docker network inspect fawkes-net >/dev/null 2>&1 || docker network create fawkes-ne
 Starting Developer Control Plane...
-WARNING: CODER_ACCESS_URL must not be localhost
-docker compose -f compose.yaml up -d
+WARNING: CODER_ACCESS_URL must not be localhos
+docker compose -f compose.yaml up -d --wait --wait-timeout 300
  Volume developerd-score-specs Creating
  Volume developerd-score-specs Creating
- Volume developerd-score-plugins Creating
- Volume developerd-score-plugins Creating
+ Volume developerd-coder-home Creating
+ Volume developerd-coder-home Creating
  Volume developerd-backstage-data Creating
  Volume developerd-backstage-data Creating
- Volume developerd-coder-home Creating
+ Volume developerd-score-plugins Creating
+ Volume developerd-score-plugins Creating
  Volume developerd-backstage-plugins Creating
  Volume developerd-backstage-plugins Creating
- Volume developerd-plugin-registry Creating
- Volume developerd-plugin-registry Creating
- Volume developerd-coder-home Creating
  Volume developerd-score-data Creating
  Volume developerd-score-data Creating
- Volume developerd-score-plugins Created
- Volume developerd-score-plugins Created
+ Volume developerd-plugin-registry Creating
+ Volume developerd-plugin-registry Creating
+ Volume developerd-coder-home Created
+ Volume developerd-coder-home Created
+ Container developerd-coder Creating
  Volume developerd-score-specs Created
  Volume developerd-score-specs Created
  Volume developerd-plugin-registry Created
@@ -65,47 +61,46 @@ docker compose -f compose.yaml up -d
  Container developerd-plugin-manager Creating
  Volume developerd-backstage-plugins Created
  Volume developerd-backstage-plugins Created
- Volume developerd-coder-home Created
- Volume developerd-coder-home Created
- Container developerd-coder Creating
+ Volume developerd-score-plugins Created
+ Volume developerd-score-plugins Created
  Volume developerd-backstage-data Created
  Volume developerd-backstage-data Created
  Container developerd-backstage Creating
  Volume developerd-score-data Created
  Volume developerd-score-data Created
  Container developerd-score Creating
+ Container developerd-coder Created
  Container developerd-plugin-manager Created
  Container developerd-score Created
  Container developerd-backstage Created
  Container developerd-gateway Creating
- Container developerd-coder Created
  Container developerd-gateway Created
- Container developerd-plugin-manager Starting
+ Container developerd-coder Starting
  Container developerd-score Starting
  Container developerd-backstage Starting
- Container developerd-coder Starting
- Container developerd-plugin-manager Started
+ Container developerd-plugin-manager Starting
+ Container developerd-coder Started
  Container developerd-score Started
  Container developerd-backstage Started
  Container developerd-gateway Starting
- Container developerd-coder Started
+ Container developerd-plugin-manager Started
  Container developerd-gateway Started
-Services starting... Use 'make status' to check progress
+ Container developerd-score Waiting
+ Container developerd-plugin-manager Waiting
+ Container developerd-gateway Waiting
+ Container developerd-coder Waiting
+ Container developerd-backstage Waiting
+ Container developerd-score Healthy
+ Container developerd-plugin-manager Healthy
+ Container developerd-backstage Healthy
+ Container developerd-gateway Healthy
+ Container developerd-coder Healthy
+Services healthy. Use 'make status' to check them
 Access the platform at http://localhost:8000
-docker compose ps
-NAME                        IMAGE                         COMMAND                  SERVICE          CREATED             STATUS                       PORTS
-developerd-backstage        ufawkesdevx-backstage         "docker-entrypoint.s…"   backstage        About an hour ago   Up About an hour (healthy)   0.0.0.0:7007->7007/tcp, [::]:7007->7007/tcp
-developerd-coder            ghcr.io/coder/coder:v2.34.3   "/opt/coder server"      coder            About an hour ago   Up About an hour (healthy)   0.0.0.0:7080->7080/tcp, [::]:7080->7080/tcp
-developerd-gateway          nginx:1.27-alpine             "/docker-entrypoint.…"   gateway          About an hour ago   Up About an hour (healthy)   80/tcp, 0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
-developerd-plugin-manager   ufawkesdevx-plugin-manager    "docker-entrypoint.s…"   plugin-manager   About an hour ago   Up About an hour (healthy)   0.0.0.0:8083->8083/tcp, [::]:8083->8083/tcp
-developerd-score            ufawkesdevx-score-service     "docker-entrypoint.s…"   score-service    About an hour ago   Up About an hour (healthy)   0.0.0.0:8081-8082->8081-8082/tcp, [::]:8081-8082->8081-8082/tcp
 Checking service health...
 healthy
 ✓ Gateway: Healthy
 {"status":"healthy","service":"score-api"}✓ Score API: Healthy
 {"status":"healthy","service":"score-webhooks"}✓ Score Webhooks: Healthy
 {"status":"healthy","service":"plugin-manager"}✓ Plugin Manager: Healthy
-http://localhost:8000/health -> 200
-http://localhost:7007/.backstage/health/v1/liveness -> 200
-http://localhost:7080/healthz -> 200
 exit=0
