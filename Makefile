@@ -15,8 +15,8 @@ install: ## Install and setup the platform
 network: ## Create the external fawkes-net Docker network (shared with other uFawkes planes)
 	docker network inspect fawkes-net >/dev/null 2>&1 || docker network create fawkes-net
 
-check-gid: ## Print the host docker.sock group GID for DOCKER_GID in .env
-	@stat -c '%g' /var/run/docker.sock 2>/dev/null || stat -f '%g' /var/run/docker.sock
+check-gid: ## Print the docker.sock group GID the containers see, for DOCKER_GID in .env
+	@docker run --rm -v /var/run/docker.sock:/var/run/docker.sock alpine stat -c %g /var/run/docker.sock
 
 backstage-bundle: ## Build the Backstage backend bundle on the host (needs Node 22 or 24; skipped if present)
 	@test -f backstage/packages/backend/dist/bundle.tar.gz || ( cd backstage && node .yarn/releases/yarn-4.13.0.cjs install --immutable && node .yarn/releases/yarn-4.13.0.cjs tsc && node .yarn/releases/yarn-4.13.0.cjs build:backend )
@@ -47,9 +47,12 @@ logs: ## Show logs from all services
 logs-%: ## Show logs from specific service (e.g., make logs-score-service)
 	docker compose logs -f $*
 
-build: ## Build all custom services
+build: backstage-bundle ## Build all custom services (builds the Backstage bundle on the host first)
 	@echo "Building services..."
 	docker compose build
+
+build-backstage: backstage-bundle ## Build the Backstage image
+	docker compose build backstage
 
 build-%: ## Build specific service (e.g., make build-score-service)
 	docker compose build $*

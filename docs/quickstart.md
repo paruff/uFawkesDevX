@@ -43,6 +43,9 @@ Set `CODER_ACCESS_URL=http://<that-ip>:7080` in `.env`.
 make build && make up
 ```
 
+`make build` first bundles the Backstage backend on the host, so it needs
+Node 22 or 24 (`brew install node@24`). Nothing else is required on a clean clone.
+
 ## 4. Coder first-run
 
 1. Navigate to `CODER_ACCESS_URL` in a browser and create the admin user.
