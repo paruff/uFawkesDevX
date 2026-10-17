@@ -122,3 +122,18 @@ class TestWorkflowValidation:
                                 f"{f.name} job '{job_name}' has no timeout-minutes",
                                 UserWarning,
                             )
+
+    def test_steps_have_names(self, workflow_files):
+        """Every step must have a 'name', except local action references ('./')."""
+        missing = []
+        for f in workflow_files:
+            with open(f) as fh:
+                config = yaml.safe_load(fh)
+            for job_name, job_config in config.get("jobs", {}).items():
+                if not isinstance(job_config, dict):
+                    continue
+                for i, step in enumerate(job_config.get("steps", [])):
+                    if "name" in step or str(step.get("uses", "")).startswith("./"):
+                        continue
+                    missing.append(f"{f.name} job '{job_name}' step {i}")
+        assert not missing, "Steps missing 'name': " + "; ".join(missing)
