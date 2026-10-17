@@ -100,7 +100,7 @@ PLACEHOLDER_SUBSTR='(changeme|change_me|change-me|example|placeholder|dummy|samp
 REFERENCE_RE='(secretKey|secretName|secretGenerator|secretRef|secrets:|existingSecret|envFrom)'
 
 # Files expected to contain credential-shaped noise. Single line only.
-EXCLUDE_RE='(^\.secrets\.baseline$|^scripts/testdata/secret-detection/|\.lock\.json$|(^|/)(node_modules|\.git|dist|build|coverage)/|\.min\.(js|css)$|(^|/)package-lock\.json$|(^|/)yarn\.lock$|(^|/)pnpm-lock\.yaml$|(^|/)poetry\.lock$|(^|/)Cargo\.lock$|(^|/)go\.sum$)'
+EXCLUDE_RE='(^\.secrets\.baseline$|^scripts/testdata/secret-detection/|\.lock\.json$|(^|/)(node_modules|\.git|dist|build|coverage)/|(^|/)\.yarn/releases/|\.min\.(js|css)$|(^|/)package-lock\.json$|(^|/)yarn\.lock$|(^|/)pnpm-lock\.yaml$|(^|/)poetry\.lock$|(^|/)Cargo\.lock$|(^|/)go\.sum$)'
 
 # ---------------------------------------------------------------------------
 # Arg parsing

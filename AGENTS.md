@@ -35,7 +35,7 @@ Read in priority order. Planning docs define *what*; architecture/governance doc
 | 5 | `docs/product/discovery-draft.md` | JTBD statement, riskiest assumption, measurable acceptance criterion, test-type reasoning |
 | 6 | `docs/product/spec.md` | Numbered functional requirements (FR-1.x … FR-8.x, NFR) traced to discovery draft |
 | 7 | `ARCHITECTURE.md` | System architecture, components, data flows |
-| 8 | `docs/CONTRACTS.md` | External integration surface: uFawkesRes Postgres, uFawkesObs OTLP, uFawkesPipe webhook, fawkes-net |
+| 8 | `docs/CONTRACTS.md` | External integration surface: storage (no external DB), uFawkesObs OTLP, uFawkesPipe webhook, fawkes-net |
 | 9 | `docs/CHANGE_IMPACT_MAP.md` | Co-change map: what breaks when configs change |
 | 10 | `docs/KNOWN_LIMITATIONS.md` | Active known issues and workarounds |
 | 11 | `DEPLOYMENT_STRATEGY.md` | Local Compose profiles, networking, secrets, health checks, rollback |
@@ -157,7 +157,7 @@ uFawkesDevX is the Developer Experience plane of the Fawkes IDP suite:
 | Repository | Role |
 | --- | --- |
 | **uFawkesDevX** | DevX — Backstage, Coder, Score, Plugin Manager |
-| **uFawkesRes** | Deprecated — was the shared Postgres/Valkey resource plane (replacement TBD, #57) |
+| **uFawkesRes** | Archived — no longer used; storage is internal (ADR-0001) |
 | **uFawkesObs** | Observability (Prometheus, Grafana, Loki, Tempo) |
 | **fawkes** | Platform CLI, integration orchestration |
 | **uFawkesPipe** | Reusable CI/CD workflow library |

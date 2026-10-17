@@ -75,7 +75,7 @@ services:
     networks:
       - fawkes-net
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7007/healthcheck"]
+      test: ["CMD", "curl", "-f", "http://localhost:7007/.backstage/health/v1/liveness"]
       interval: 30s
       timeout: 10s
       retries: 5

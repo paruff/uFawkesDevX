@@ -8,20 +8,16 @@
 
 ## Contract Inventory
 
-### C1 — External Postgres (inbound to DevX)
+### C1 — Storage (internal; no external database)
 
 | Aspect | Value |
 |---|---|
-| Direction | uFawkesDevX consumes an external Postgres (formerly uFawkesRes, which is deprecated; replacement TBD, #57) |
-| Transport | TCP on `fawkes-net`, host `postgres`, port `5432` |
-| DBs used | `coder`, `backstage`, `score` |
-| Credentials | `.env` → `CODER_DB_PASSWORD`, `BACKSTAGE_DB_PASSWORD`, `POSTGRES_PASSWORD` |
-| Owner | Undecided until #57 picks a provider |
-| Breaking change | Postgres hostname/port/schema change, DB drop, or version bump (PG 15 → 16) |
-| Verification | `psql -h postgres -U <user> -c "SELECT 1"` for each DB |
-| Change process | Coordinate with the Postgres provider's owner once #57 decides one; require both repos' CI green |
-
-**Schema expectations (DevX side):** Backstage manages its own schema; Coder manages its own. Score Service expects a `specs` table (id UUID, name, spec YAML, timestamps) — created by its own migration on startup.
+| Direction | None. uFawkesDevX consumes no external database ([ADR-0001](adr/0001-no-separate-database-service.md)) |
+| Storage | `score-service`: SQLite at `/data/score.db` (`score-data` volume). Backstage: SQLite files in `/data` (`backstage-data` volume). Coder: built-in Postgres under `/home/coder` |
+| Owner | This repo |
+| Breaking change | Moving a component off SQLite or Coder's built-in Postgres, or renaming a data volume |
+| Verification | `make up && make health`; restart the stack and confirm Score specs and the Backstage catalog persist |
+| Change process | New ADR; data volumes need a migration note in `docs/KNOWN_LIMITATIONS.md` |
 
 ### C2 — uFawkesObs OTLP (outbound from DevX, planned in M1.6)
 

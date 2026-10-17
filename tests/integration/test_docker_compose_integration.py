@@ -64,7 +64,9 @@ class TestDockerComposeIntegration:
     def test_backstage_responds_on_port_7007(self):
         """Backstage portal should respond."""
         try:
-            response = requests.get("http://localhost:7007/healthcheck", timeout=10)
+            response = requests.get(
+                "http://localhost:7007/.backstage/health/v1/liveness", timeout=10
+            )
             assert response.status_code == 200
         except requests.exceptions.ConnectionError:
             pytest.skip("Backstage not available on port 7007")

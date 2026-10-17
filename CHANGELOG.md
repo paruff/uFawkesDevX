@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial governance baseline (CODE_OF_CONDUCT, expanded FUNDING.yml)
 - release-please workflow automation
+- Backstage app source (Yarn 4, Node 24) so `make up` builds the Backstage image
+- ADR-0001: no separate database service (SQLite for Score and Backstage, Coder's built-in Postgres)
+
+### Changed
+
+- Backstage health check moved to `/.backstage/health/v1/liveness`
+- Root `specification.md`, `design.md` and `plan.md` moved to `docs/ai-sdlc/v0.1.0/`
+- Removed uFawkesRes from the contracts, catalog and `INTENT.md`
 
 ## [1.1.0](https://github.com/paruff/uFawkesDevX/compare/v1.0.1...v1.1.0) (2026-10-07)
 

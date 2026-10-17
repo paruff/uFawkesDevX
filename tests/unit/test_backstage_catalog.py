@@ -59,7 +59,7 @@ class TestBackstageCatalog:
                     f"{path.name}: missing metadata.name"
                 )
 
-    def test_catalog_locations_cover_all_five_planes(self):
+    def test_catalog_locations_cover_all_live_planes(self):
         entities = _collect_all_entities()
         names = {
             e["metadata"]["name"]
@@ -70,11 +70,12 @@ class TestBackstageCatalog:
             "ufawkes-devx",
             "ufawkes-pipe",
             "ufawkes-sec",
-            "ufawkes-res",
             "ufawkes-obs",
         }
         missing = expected_planes - names
         assert not missing, f"catalog is missing plane entities: {missing}"
+        # uFawkesRes is archived (ADR-0001); it must not come back as a live plane.
+        assert "ufawkes-res" not in names
 
     def test_no_eclipse_che_references(self):
         """Eclipse Che was removed from compose.yaml in DX-002 — the catalog
