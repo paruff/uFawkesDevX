@@ -43,6 +43,11 @@ const DATABASE_PATH = process.env.DATABASE_PATH || '/data/score.db';
 const JSON_COLUMNS = ['spec', 'metadata'];
 let db;
 
+function isPathWithinDir(targetPath, baseDir) {
+  const relative = path.relative(baseDir, targetPath);
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
 // Minimal pg-shaped helper: returns { rows } and parses the JSON TEXT columns
 // that Postgres used to return as objects (JSONB).
 function query(sql, params = []) {
@@ -106,10 +111,11 @@ async function loadPlugins() {
 
         const pluginPath = path.join(PLUGINS_DIR, file);
 
-        // Ensure the resolved path is still within PLUGINS_DIR
+        // Ensure the resolved path is still within PLUGINS_DIR, even when the
+        // path is reached through a symlinked parent or a nested path.
         const resolvedPath = path.resolve(pluginPath);
         const resolvedPluginDir = path.resolve(PLUGINS_DIR);
-        if (!resolvedPath.startsWith(resolvedPluginDir)) {
+        if (!isPathWithinDir(resolvedPath, resolvedPluginDir)) {
           console.warn(`Skipping plugin outside plugins directory: ${file}`);
           continue;
         }
@@ -529,4 +535,11 @@ if (require.main === module) {
   start();
 }
 
-module.exports = { generateComposeFromSpec, triggerPipelineWebhook, initDatabase, query };
+module.exports = {
+  generateComposeFromSpec,
+  triggerPipelineWebhook,
+  initDatabase,
+  query,
+  loadPlugins,
+  isPathWithinDir,
+};

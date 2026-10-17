@@ -134,3 +134,27 @@ test('SQLite store: upsert bumps version, JSON columns round-trip as objects, RE
   assert.equal(deleted.length, 1);
   assert.equal(query('SELECT * FROM score_specs WHERE name = ?', ['web']).rows.length, 0);
 });
+
+test('loadPlugins ignores plugin filenames that resolve outside the plugins directory', async () => {
+  const { loadPlugins } = freshServerModule({
+    PLUGINS_DIR: '/tmp/score-plugins-test',
+  });
+
+  const pluginsDir = '/tmp/score-plugins-test';
+  const privilegedDir = '/tmp';
+  await fs.mkdir(pluginsDir, { recursive: true });
+  await fs.mkdir(privilegedDir, { recursive: true });
+
+  const pluginPath = path.join(pluginsDir, 'good.js');
+  await fs.writeFile(pluginPath, 'module.exports = { name: "good", validateSpec: () => ({ valid: true }) };');
+
+  const escapeName = '../escape.js';
+  const escapePath = path.join(pluginsDir, escapeName);
+  await fs.writeFile(escapePath, 'module.exports = { name: "escape", validateSpec: () => ({ valid: true }) };');
+
+  await loadPlugins();
+
+  assert.ok((await fs.readFile(pluginPath, 'utf8')).includes('good'));
+  const pluginNames = Array.from(require.cache[require.resolve('./server.js')].exports || {}).map(([name]) => name);
+  assert.ok(!pluginNames.includes('escape'));
+});
