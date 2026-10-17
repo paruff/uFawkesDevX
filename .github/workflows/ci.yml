@@ -56,3 +56,32 @@ jobs:
       - name: DORA job finish
         if: always()
         run: echo "job-finish:$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+  backstage-build:
+    name: Clean-clone build and up
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: "24"
+
+      - name: Configure environment
+        run: |
+          cp .env.example .env
+          sed -i "s/^DOCKER_GID=.*/DOCKER_GID=$(make -s check-gid)/" .env
+          sed -i "s|^CODER_ACCESS_URL=.*|CODER_ACCESS_URL=http://$(hostname -I | cut -d' ' -f1):7080|" .env
+
+      - name: Build and start all services (make build, make up)
+        run: make network build up
+
+      - name: Show service status
+        run: make status
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs
