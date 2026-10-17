@@ -1,0 +1,70 @@
+name: Live Acceptance
+
+# Starts the real stack on a clean runner and checks it answers.
+# Listed as a live check in uFawkes.dev docs/ai-sdlc/suite-release/live-checks.yml.
+# No Postgres service container: ADR-0001 (#57) — Score/Backstage use SQLite, Coder its built-in Postgres.
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-acceptance
+  cancel-in-progress: false
+
+jobs:
+  live-acceptance:
+    name: Live acceptance (make up)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: DORA job start
+        run: echo "job-start:$(date -u +%Y-%m-%dT%H:%M:%SZ) workflow:${{ github.workflow }} sha:${{ github.sha }}"
+
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Node (Backstage bundle build, KL-17)
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+
+      - name: Write .env
+        run: |
+          cp .env.example .env
+          echo "DOCKER_GID=$(make -s check-gid)" >> .env
+
+      - name: make up
+        run: make up
+
+      - name: Live checks
+        run: scripts/live-acceptance.sh
+
+      - name: Capture container state on failure
+        if: failure()
+        run: |
+          docker compose ps -a | tee compose-ps.txt
+          docker compose logs --no-color --tail=200 > compose-logs.txt
+
+      - name: Upload evidence
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: live-acceptance-evidence
+          path: compose-*.txt
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
+
+      - name: DORA job finish
+        if: always()
+        run: |
+          echo "job-finish:$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "pipeline-result: ${{ job.status == 'success' && 'success' || 'failure' }}"
