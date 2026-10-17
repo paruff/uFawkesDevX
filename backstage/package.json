@@ -51,7 +51,8 @@
   "resolutions": {
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "got": "^11.8.2"
+    "got": "^11.8.2",
+    "tar": "^7.5.22"
   },
   "prettier": "@backstage/cli/config/prettier",
   "lint-staged": {
