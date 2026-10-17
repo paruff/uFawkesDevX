@@ -5,6 +5,18 @@ All notable changes to uFawkesDevX will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0](https://github.com/paruff/uFawkesDevX/compare/v1.2.0...v1.3.0) (2026-10-17)
+
+
+### Added
+
+* **make:** add test-quiet target ([#133](https://github.com/paruff/uFawkesDevX/issues/133)) ([#135](https://github.com/paruff/uFawkesDevX/issues/135)) ([9f6e080](https://github.com/paruff/uFawkesDevX/commit/9f6e080a31ba3ead5575773a23c0a7ef78115dfb))
+
+
+### Docs
+
+* add command-output rules to AGENTS.md ([#133](https://github.com/paruff/uFawkesDevX/issues/133)) ([4fdc969](https://github.com/paruff/uFawkesDevX/commit/4fdc969d63a5be8a0712905e2e66f02a9b02f108))
+
 ## [1.2.0](https://github.com/paruff/uFawkesDevX/compare/v1.1.0...v1.2.0) (2026-10-17)
 
 
