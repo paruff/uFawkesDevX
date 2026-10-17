@@ -58,7 +58,7 @@ jobs:
         run: echo "job-finish:$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
   backstage-build:
-    name: Backstage clean-clone build
+    name: Clean-clone build and up
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -71,14 +71,17 @@ jobs:
           node-version: "24"
 
       - name: Configure environment
-        run: cp .env.example .env
+        run: |
+          cp .env.example .env
+          sed -i "s/^DOCKER_GID=.*/DOCKER_GID=$(make -s check-gid)/" .env
+          sed -i "s|^CODER_ACCESS_URL=.*|CODER_ACCESS_URL=http://$(hostname -I | cut -d' ' -f1):7080|" .env
 
-      - name: Build images (make build)
-        run: make network build
+      - name: Build and start all services (make build, make up)
+        run: make network build up
 
-      - name: Start Backstage and wait until healthy
-        run: docker compose up -d --wait --wait-timeout 300 backstage
+      - name: Show service status
+        run: make status
 
-      - name: Show Backstage logs on failure
+      - name: Show logs on failure
         if: failure()
-        run: docker compose logs backstage
+        run: docker compose logs
