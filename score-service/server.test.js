@@ -134,3 +134,20 @@ test('SQLite store: upsert bumps version, JSON columns round-trip as objects, RE
   assert.equal(deleted.length, 1);
   assert.equal(query('SELECT * FROM score_specs WHERE name = ?', ['web']).rows.length, 0);
 });
+
+test('loadPlugins ignores symlinked plugins that resolve outside the plugins directory', async () => {
+  const pluginsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'score-plugins-'));
+  const externalTarget = path.join(await fs.mkdtemp(path.join(os.tmpdir(), 'score-external-')), 'outside.js');
+  const goodPath = path.join(pluginsDir, 'good.js');
+  const symlinkPath = path.join(pluginsDir, 'outside.js');
+
+  await fs.writeFile(externalTarget, 'module.exports = { name: "outside", validateSpec: () => ({ valid: true }) };');
+  await fs.writeFile(goodPath, 'module.exports = { name: "good", validateSpec: () => ({ valid: true }) };');
+  await fs.symlink(externalTarget, symlinkPath);
+
+  const { plugins, loadPlugins } = freshServerModule({ PLUGINS_DIR: pluginsDir });
+  await loadPlugins();
+
+  assert.ok(plugins.has('good'));
+  assert.equal(plugins.has('outside'), false);
+});
