@@ -5,6 +5,43 @@ All notable changes to uFawkesDevX will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0](https://github.com/paruff/uFawkesDevX/compare/v1.1.0...v1.2.0) (2026-10-17)
+
+
+### Added
+
+* **infra:** type-check the services' JavaScript with tsc ([#101](https://github.com/paruff/uFawkesDevX/issues/101)) ([3d4206f](https://github.com/paruff/uFawkesDevX/commit/3d4206f491d73ef6214a7095b6d99c37de318415))
+* run without uFawkesRes, Backstage app source, clean-host verified ([#122](https://github.com/paruff/uFawkesDevX/issues/122)) ([4ca7eb8](https://github.com/paruff/uFawkesDevX/commit/4ca7eb866a3e1489a85cde188643cdccc0e32967))
+* **shift-left:** keep this clone's git hooks in step with the hook config ([#105](https://github.com/paruff/uFawkesDevX/issues/105)) ([692dafd](https://github.com/paruff/uFawkesDevX/commit/692dafd94ca370e760888c2be3d30f98fca4cbef))
+* SQLite for score-service and Backstage, built-in Postgres for Coder ([#57](https://github.com/paruff/uFawkesDevX/issues/57)) ([#119](https://github.com/paruff/uFawkesDevX/issues/119)) ([630f45c](https://github.com/paruff/uFawkesDevX/commit/630f45c49332e1db6aaa94e4a2fa5bf57e3d3130))
+* **types:** add a mypy type check over tests/ ([#99](https://github.com/paruff/uFawkesDevX/issues/99)) ([#120](https://github.com/paruff/uFawkesDevX/issues/120)) ([167d074](https://github.com/paruff/uFawkesDevX/commit/167d074eef7f9466075b99c4114ece70e632ba61))
+
+
+### Fixed
+
+* **changelog:** restore release history; repair issue-form schema ([#113](https://github.com/paruff/uFawkesDevX/issues/113)) ([3500cab](https://github.com/paruff/uFawkesDevX/commit/3500cabaa7c21f4f59c3b713e5eafa8d0dbb5b88))
+* **make:** build Backstage from a clean clone ([#98](https://github.com/paruff/uFawkesDevX/issues/98)) ([#130](https://github.com/paruff/uFawkesDevX/issues/130)) ([bdd4868](https://github.com/paruff/uFawkesDevX/commit/bdd4868d5cffaab5d69af6084afcca8a60ddfef8))
+* **make:** wait for healthy services in make up ([#127](https://github.com/paruff/uFawkesDevX/issues/127)) ([b55498a](https://github.com/paruff/uFawkesDevX/commit/b55498a700674b131be06571d4009e98000b3fc5))
+* **score-service:** reject plugins that resolve outside the plugins dir ([#125](https://github.com/paruff/uFawkesDevX/issues/125)) ([ed710fd](https://github.com/paruff/uFawkesDevX/commit/ed710fd9818018c37918a0a2848ce68a7475d7d1))
+* **templates:** replace unrunnable `npm run verify`; drop dangling labels ([#111](https://github.com/paruff/uFawkesDevX/issues/111)) ([d803baf](https://github.com/paruff/uFawkesDevX/commit/d803baf04265cb3c1e577489d5d2ea2db916a02a))
+
+
+### Docs
+
+* **changelog:** add Keep a Changelog header and Unreleased section ([#108](https://github.com/paruff/uFawkesDevX/issues/108)) ([f646809](https://github.com/paruff/uFawkesDevX/commit/f646809ff88e776af3f971e62b89059bec8e6913))
+* **governance:** add CODE_OF_CONDUCT, expand FUNDING.yml ([#107](https://github.com/paruff/uFawkesDevX/issues/107)) ([e297562](https://github.com/paruff/uFawkesDevX/commit/e297562ac67edbe6b5f5111ee1f24cd17fc8faa3))
+* **issue-templates:** add bug_report, feature, security templates ([#110](https://github.com/paruff/uFawkesDevX/issues/110)) ([cd1648b](https://github.com/paruff/uFawkesDevX/commit/cd1648b7a01212b9970e955beb8d2fefd1ad71d5))
+* **pr-template:** add standardized PR template ([#109](https://github.com/paruff/uFawkesDevX/issues/109)) ([190e2df](https://github.com/paruff/uFawkesDevX/commit/190e2dfd808f69fc715510f201a1e8230f6d0725))
+* **readme:** cite research basis (paruff/uFawkes.dev[#65](https://github.com/paruff/uFawkesDevX/issues/65)) ([#117](https://github.com/paruff/uFawkesDevX/issues/117)) ([e1355c1](https://github.com/paruff/uFawkesDevX/commit/e1355c1e22d3b3eb5db2bb4f459cc86948bbf91d))
+
+
+### Chores
+
+* **ci:** adopt Pipe v1.15.0-beta.1 and the CI image ([#181](https://github.com/paruff/uFawkesDevX/issues/181)) ([#114](https://github.com/paruff/uFawkesDevX/issues/114)) ([edd0fe5](https://github.com/paruff/uFawkesDevX/commit/edd0fe53af736929e188a42b4b466a857802b8c1))
+* **ci:** bump uFawkesPipe reusables to v1.16.0-beta.1 ([#116](https://github.com/paruff/uFawkesDevX/issues/116)) ([4f9e115](https://github.com/paruff/uFawkesDevX/commit/4f9e1152f43f4bde7f5df93157a9e8b19a53bbf7))
+* **infra:** adopt the OpenCode shift-left plugin ([#153](https://github.com/paruff/uFawkesDevX/issues/153)) ([#115](https://github.com/paruff/uFawkesDevX/issues/115)) ([7147e2d](https://github.com/paruff/uFawkesDevX/commit/7147e2d6f0a5e49a59d7643c9ae85f8be20cec92))
+* **release:** prepare v1.1.1 ([#131](https://github.com/paruff/uFawkesDevX/issues/131)) ([557673f](https://github.com/paruff/uFawkesDevX/commit/557673ffe35e65816e65e4c4af42caf11a943861))
+
 ## [Unreleased]
 
 ## [1.1.1] - 2026-10-17
