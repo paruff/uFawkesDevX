@@ -24,8 +24,8 @@ backstage-bundle: ## Build the Backstage backend bundle on the host (needs Node 
 start: network backstage-bundle ## Start all services
 	@echo "Starting Developer Control Plane..."
 	@grep -q localhost .env 2>/dev/null && echo "WARNING: CODER_ACCESS_URL must not be localhost" || true
-	docker compose -f compose.yaml up -d
-	@echo "Services starting... Use 'make status' to check progress"
+	docker compose -f compose.yaml up -d --wait --wait-timeout 300
+	@echo "Services healthy. Use 'make status' to check them"
 	@echo "Access the platform at http://localhost:8000"
 
 dev: network backstage-bundle ## Start with compose.override.yaml (source mounts; needs `npm install` in score-service and plugin-manager)
