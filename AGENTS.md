@@ -176,3 +176,10 @@ repo. Link to it; don't copy it here.
 - Text must meet 4.5:1 contrast. `#16a34a` on white is 3.30:1 and fails.
 - If this repo needs a value the reference does not have, propose it in
   uFawkes.dev rather than adding a local one.
+
+## Command output
+
+- Prefer the `gh` CLI over the GitHub MCP tools. Always use `--json` with `--jq`.
+- CI failures: `gh run view <id> --log-failed | tail -100`. Never fetch full logs.
+- Run tests through `make test-quiet` (failures only). Pipe other long output through `head` or `tail`.
+- Read targeted line ranges, not whole files.
