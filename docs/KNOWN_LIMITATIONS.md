@@ -1,6 +1,6 @@
 # Known Limitations — uFawkesDevX
 
-**Status:** Active | **Owner:** Platform Team | **Last Updated:** 2026-10-17
+**Status:** Active | **Owner:** Platform Team | **Last Updated:** 2026-11-09
 
 ---
 
@@ -23,7 +23,7 @@
 | KL-6 | **Backstage catalog entities not auto-discovered** — Services must be manually added to `backstage/catalog/` as YAML files | New services don't appear in catalog without manual step | Add `catalog-info.yaml` to each service directory | H2: score-service emits catalog entity on startup via Backstage API |
 | KL-7 | **Backstage TechDocs uses local filesystem** — Docs built with `mkdocs` stored in volume, no multi-developer sync | Each Coder workspace has its own TechDocs; changes don't propagate | Use the Backstage UI directly for docs viewing | H2: shared TechDocs volume or Git-backed docs |
 | KL-8 | **No Backstage auth provider** — Local guest auth only; no GitHub/OIDC | Anyone on `localhost:7007` can access; no audit trail | Acceptable for single-developer localhost | H3: GitHub OAuth or OIDC when LAN-shared |
-| KL-16 | **Backstage ships with accepted dependency advisories** — 13 CVEs in `backstage/yarn.lock` (node-forge and braces have no fix; react-router, graphql-tools, basic-ftp and others need major bumps Backstage does not support yet), listed in `.trivyignore` with a 2027-01-15 expiry | The local Backstage portal carries known library issues; not suitable to expose beyond localhost | Keep port 7007 on localhost; the same-major fixes (tar, undici, adm-zip) are already pinned | Run `backstage-cli versions:bump` when Backstage ships updates; re-review before the expiry |
+| KL-16 | **Security scanning currently requires accepted dependency advisories** — 22 CVEs across `backstage/yarn.lock`, `plugin-manager/package-lock.json` and `score-service/package-lock.json` are listed in `.trivyignore` with a 2027-01-15 expiry while upstream/transitive update paths are validated | Local services carry known library issues; not suitable to expose beyond localhost | Keep service ports localhost-only; maintain same-major pins where available (for example `tar` and `adm-zip`) | Upgrade Backstage/services and remove suppressions as compatible dependency chains are released; re-review before the expiry |
 | KL-17 | **`make build` / `make up` build the Backstage backend on the host** — `make backstage-bundle` needs Node 22 or 24; the full install does not fit a small Docker VM | `make build` / `make up` fail on a host without a supported Node | Install Node 22 or 24 (`nvm`, `brew install node@24`) | Build the bundle in CI and publish an image |
 
 ### Score Service
