@@ -91,5 +91,3 @@
 | [VISION.md](VISION.md) | North star, principles, non-goals, riskiest assumption |
 | [EXECUTION_QUEUE.md](EXECUTION_QUEUE.md) | Weekly priority queue (P0–P3) feeding these milestones |
 | [plan-for-the-day.md](plan-for-the-day.md) | Today's work pulled from queue |
-| [docs/product/discovery-draft.md](docs/product/discovery-draft.md) | JTBD and acceptance criteria behind M1.x/M2.x |
-| [docs/product/spec.md](docs/product/spec.md) | Functional requirements for each milestone deliverable |

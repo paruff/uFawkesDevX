@@ -104,4 +104,3 @@ gh pr create --title "fix(ci): resolve gitleaks false positive on test fixtures"
 |---|---|
 | [EXECUTION_QUEUE.md](EXECUTION_QUEUE.md) | Source of truth for priority tiers and task definitions |
 | [MILESTONES.md](MILESTONES.md) | Milestones these tasks feed |
-| [docs/product/spec.md](docs/product/spec.md) | Functional requirements for each task |
