@@ -55,8 +55,6 @@
 | [MILESTONES.md](MILESTONES.md) | Monthly/quarterly deliverables that ladder up to vision principles |
 | [EXECUTION_QUEUE.md](EXECUTION_QUEUE.md) | Weekly priority queue (P0–P3) with scope-drift guardrails |
 | [plan-for-the-day.md](plan-for-the-day.md) | Today's single goal, pulled from queue, with TDD protocol |
-| [docs/product/discovery-draft.md](docs/product/discovery-draft.md) | JTBD statement, riskiest assumption, acceptance criterion, test-type reasoning |
-| [docs/product/spec.md](docs/product/spec.md) | Numbered functional requirements referencing discovery draft |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | System components, data flows, external dependencies, boundaries |
 | [docs/CONTRACTS.md](docs/CONTRACTS.md) | External integration surface and contract-change protocol |
 | [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) | Active known issues and workarounds |

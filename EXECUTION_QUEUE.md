@@ -94,4 +94,3 @@
 | [VISION.md](VISION.md) | North star and principles that define "done" |
 | [MILESTONES.md](MILESTONES.md) | Monthly deliverables this queue feeds |
 | [plan-for-the-day.md](plan-for-the-day.md) | Today's single goal pulled from P0/P1 |
-| [docs/product/spec.md](docs/product/spec.md) | Functional requirements for each queued task |
