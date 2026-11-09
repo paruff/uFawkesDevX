@@ -60,7 +60,7 @@
 
 ## Backstage ↔ Score ↔ Plugin Manager (internal contracts)
 
-These are internal to uFawkesDevX but MUST NOT change without updating `docs/product/spec.md` and `gateway/api-docs/`:
+These are internal to uFawkesDevX but MUST NOT change without updating `gateway/api-docs/` and this file:
 
 | Contract | Definition | Source of Truth |
 |---|---|---|
@@ -88,4 +88,3 @@ These are internal to uFawkesDevX but MUST NOT change without updating `docs/pro
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Where these contracts live in the system |
 | [VISION.md](../VISION.md) | Why these contracts exist (plot-plane integration) |
 | [docs/CHANGE_IMPACT_MAP.md](CHANGE_IMPACT_MAP.md) | What breaks when a contract changes |
-| [docs/product/spec.md](spec.md) | The consumer-side requirements these contracts serve |

@@ -32,20 +32,18 @@ Read in priority order. Planning docs define *what*; architecture/governance doc
 | 2 | `MILESTONES.md` | Horizon map (H1/H2/H3), milestone deliverables, release gates, traceability to vision (months) |
 | 3 | `EXECUTION_QUEUE.md` | Priority tiers P0–P3, scope-drift protection, bottom-up feedback loop (weeks) |
 | 4 | `plan-for-the-day.md` | Today's single goal, target issues, TDD execution protocol, retrospective (today) |
-| 5 | `docs/product/discovery-draft.md` | JTBD statement, riskiest assumption, measurable acceptance criterion, test-type reasoning |
-| 6 | `docs/product/spec.md` | Numbered functional requirements (FR-1.x … FR-8.x, NFR) traced to discovery draft |
-| 7 | `ARCHITECTURE.md` | System architecture, components, data flows |
-| 8 | `docs/CONTRACTS.md` | External integration surface: storage (no external DB), uFawkesObs OTLP, uFawkesPipe webhook, fawkes-net |
-| 9 | `docs/CHANGE_IMPACT_MAP.md` | Co-change map: what breaks when configs change |
-| 10 | `docs/KNOWN_LIMITATIONS.md` | Active known issues and workarounds |
-| 11 | `DEPLOYMENT_STRATEGY.md` | Local Compose profiles, networking, secrets, health checks, rollback |
-| 12 | `RELEASE_PROCESS.md` | Release checklist (tests → docs → changelog → tag → deploy+verify), rollback |
-| 13 | `AI_STANCE.md` | AI tooling policy, agent guardrails, hard vs. soft rules |
-| 14 | `docs/MODEL_POLICY.md` | Grade-based model routing (S/A/B/C/F); no hardcoded model names |
-| 15 | `compose.yaml` | Service definitions, profiles, volumes, networks |
-| 16 | `docker-compose.override.yml` | Dev overrides (ports, volumes, env) |
-| 17 | `docs/PR_STANDARD.md` | PR naming and commit rules |
-| 18 | `.github/workflows/` | CI/CD pipeline definitions |
+| 5 | `ARCHITECTURE.md` | System architecture, components, data flows |
+| 6 | `docs/CONTRACTS.md` | External integration surface: storage (no external DB), uFawkesObs OTLP, uFawkesPipe webhook, fawkes-net |
+| 7 | `docs/CHANGE_IMPACT_MAP.md` | Co-change map: what breaks when configs change |
+| 8 | `docs/KNOWN_LIMITATIONS.md` | Active known issues and workarounds |
+| 9 | `DEPLOYMENT_STRATEGY.md` | Local Compose profiles, networking, secrets, health checks, rollback |
+| 10 | `RELEASE_PROCESS.md` | Release checklist (tests → docs → changelog → tag → deploy+verify), rollback |
+| 11 | `AI_STANCE.md` | AI tooling policy, agent guardrails, hard vs. soft rules |
+| 12 | `docs/MODEL_POLICY.md` | Grade-based model routing (S/A/B/C/F); no hardcoded model names |
+| 13 | `compose.yaml` | Service definitions, profiles, volumes, networks |
+| 14 | `docker-compose.override.yml` | Dev overrides (ports, volumes, env) |
+| 15 | `docs/PR_STANDARD.md` | PR naming and commit rules |
+| 16 | `.github/workflows/` | CI/CD pipeline definitions |
 
 ## §3.1 Hard Rules vs. Docs (Never Delegate)
 
