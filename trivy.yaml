@@ -23,3 +23,5 @@
 scan:
   skip-dirs:
     - templates
+  scanners:
+    - vuln
