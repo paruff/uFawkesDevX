@@ -42,6 +42,7 @@ jobs:
       scan-type: all
       severity-threshold: MEDIUM
       fail-on-critical: true
+      ignore-unfixed: false
       upload-sarif: true
 
   # The reusable scan above writes SARIF only, so a failure names no package or CVE in
