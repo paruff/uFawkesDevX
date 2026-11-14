@@ -17,6 +17,7 @@ so `package.json` doesn't change.
 | ---- | ------------------------------------------------------------------------------------------------------------- |
 | S1   | `proxy-addr` 2.0.7 to 2.0.8 in `score-service/package-lock.json` (CVE-2026-90711, CRITICAL), uFawkesDevX#103  |
 | S2   | Make a failing scan name its findings in the log (uFawkesDevX#102), so the next one needs no local re-run     |
+| S3   | Align `.trivyignore` with the current Security Findings table (run 42701254262) and keep KL-16 in sync so CI tracks the same accepted advisory set |
 
 ## Verification Strategy
 

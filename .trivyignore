@@ -5,7 +5,7 @@
 # Fix path: `backstage-cli versions:bump` when Backstage ships updated dependencies.
 #
 # Fixed by a same-major pin in backstage/package.json "resolutions", not ignored:
-# tar (GHSA-23hp-3jrh-7fpw and others), undici 7.29.1, adm-zip 0.6.1.
+# tar (GHSA-23hp-3jrh-7fpw and others), adm-zip 0.6.1.
 
 # No fixed version available
 CVE-2026-93687 exp:2027-01-15
@@ -25,3 +25,26 @@ CVE-2026-41907 exp:2027-01-15
 
 # Fix needs a minor bump of prismjs that react-syntax-highlighter (refractor) pins at ~1.27
 CVE-2024-53382 exp:2027-01-15
+
+# New advisories from Trivy run 42701254262. These are transitive dependencies in
+# backstage/yarn.lock, plugin-manager/package-lock.json and
+# score-service/package-lock.json and are tracked in docs/KNOWN_LIMITATIONS.md.
+# Fix path: upgrade Backstage/services when compatible transitive chains are available.
+CVE-2026-115923 exp:2027-01-15
+CVE-2026-116689 exp:2027-01-15
+CVE-2026-118773 exp:2027-01-15
+CVE-2026-118764 exp:2027-01-15
+CVE-2026-118779 exp:2027-01-15
+CVE-2026-118782 exp:2027-01-15
+CVE-2026-119187 exp:2027-01-15
+CVE-2026-119188 exp:2027-01-15
+CVE-2026-119190 exp:2027-01-15
+CVE-2026-118777 exp:2027-01-15
+CVE-2026-118778 exp:2027-01-15
+CVE-2026-119186 exp:2027-01-15
+CVE-2026-110816 exp:2027-01-15
+CVE-2026-109383 exp:2027-01-15
+CVE-2026-109829 exp:2027-01-15
+CVE-2026-87018 exp:2027-01-15
+CVE-2026-109932 exp:2027-01-15
+CVE-2026-87029 exp:2027-01-15
