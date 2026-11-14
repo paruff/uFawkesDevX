@@ -5,6 +5,12 @@
 > [ADR-0001](../../adr/0001-no-separate-database-service.md): SQLite for
 > `score-service` and Backstage, Coder's built-in Postgres. Treat the
 > uFawkesRes and uFawkesSec mentions below as historical.
+>
+> **Note (2026-11-13):** this file was written for `v0.2` and is kept under
+> `v0.1.0/`; the released version is `1.2.0` (`CHANGELOG.md`). It is named
+> `specification.md`, not `spec.md`, because the artifact-chain check wants an
+> `intent.md` beside every `spec.md` and this folder has none. Criteria 9 to
+> 11 in section 5 come from the suite audit of that date (#153).
 
 _Developer Experience Plane of the Fawkes IDP Family_
 
@@ -227,6 +233,22 @@ No secret values in any tracked file. `.env` is git-ignored; `.env.example` is t
 6. `cookiecutter templates/python-flask-app` produces a directory with valid `.fawkespipe.yml`, `score.yaml`, and `.devcontainer/devcontainer.json`.
 7. `pytest tests/unit/` passes with zero failures.
 8. `pre-commit run --all-files` passes.
+
+Added 2026-11-13 from the suite audit (#153). None is met at `c53f72c`:
+
+9. Each golden-path `.fawkespipe.yml`, rendered with default values, is
+   accepted by uFawkesPipe's generator at the uFawkesPipe release that
+   `docs/golden-paths.md` names. Today all four omit the required `app.type`
+   and put `image` at the top level where the contract has `build.image`; the
+   node template sets `language: node` where only `nodejs` is valid; and no
+   release is named (#149). Criterion 6's "valid" is what this defines.
+10. No tracked file outside the ADRs, the CHANGELOG and lines marked
+    historical describes an external Postgres, Jenkins or uFawkesSec as part
+    of the stack. Today the README, `DEPLOYMENT_STRATEGY.md`,
+    `score-service/config/service.yaml`, `postgres/init/`, `test-platform.sh`,
+    two Jenkins tests and a `ufawkes-sec` catalog system do (#150).
+11. `main-ci-guard.yml` watches the workflow that runs uFawkesPipe's
+    reusables. Today it watches `ci.yml`; they run in `ci-pipeline.yml` (#152).
 
 ---
 
