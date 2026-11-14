@@ -26,16 +26,25 @@ CVE-2026-41907 exp:2027-01-15
 # Fix needs a minor bump of prismjs that react-syntax-highlighter (refractor) pins at ~1.27
 CVE-2024-53382 exp:2027-01-15
 
-# New advisories from Trivy run 40150039353. These are transitive dependencies in
+# New advisories from Trivy run 42701254262. These are transitive dependencies in
 # backstage/yarn.lock, plugin-manager/package-lock.json and
 # score-service/package-lock.json and are tracked in docs/KNOWN_LIMITATIONS.md.
 # Fix path: upgrade Backstage/services when compatible transitive chains are available.
-CVE-2026-109461 exp:2027-01-15
-CVE-2026-111181 exp:2027-01-15
-CVE-2026-113872 exp:2027-01-15
-CVE-2026-109869 exp:2027-01-15
-CVE-2026-109841 exp:2027-01-15
-CVE-2026-109924 exp:2027-01-15
-CVE-2023-54404 exp:2027-01-15
-CVE-2026-110180 exp:2027-01-15
-CVE-2026-110306 exp:2027-01-15
+CVE-2026-115923 exp:2027-01-15
+CVE-2026-116689 exp:2027-01-15
+CVE-2026-118773 exp:2027-01-15
+CVE-2026-118764 exp:2027-01-15
+CVE-2026-118779 exp:2027-01-15
+CVE-2026-118782 exp:2027-01-15
+CVE-2026-119187 exp:2027-01-15
+CVE-2026-119188 exp:2027-01-15
+CVE-2026-119190 exp:2027-01-15
+CVE-2026-118777 exp:2027-01-15
+CVE-2026-118778 exp:2027-01-15
+CVE-2026-119186 exp:2027-01-15
+CVE-2026-110816 exp:2027-01-15
+CVE-2026-109383 exp:2027-01-15
+CVE-2026-109829 exp:2027-01-15
+CVE-2026-87018 exp:2027-01-15
+CVE-2026-109932 exp:2027-01-15
+CVE-2026-87029 exp:2027-01-15
