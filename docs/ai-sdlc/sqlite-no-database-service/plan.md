@@ -1,6 +1,6 @@
 # Plan: no separate database service for v0.1.0
 
-**Traces to:** AC-DEVX-01, uFawkesDevX#57 | **Status:** In review
+**Traces to:** AC-DEVX-01, uFawkesDevX#57 | **Status:** Shipped in `1.2.0` (2026-10-17). Files it left behind are in #150
 
 uFawkesRes (the shared Postgres) is deprecated. The owner decided on SQLite where
 a component supports it and Coder's built-in Postgres where it does not, so
