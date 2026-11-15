@@ -23,7 +23,8 @@ jobs:
     uses: paruff/ufawkespipe/.github/workflows/reusable-preflight.yml@main # main branch
     with:
       # CI's hook stages run in the suite's CI image (ci-pipeline spec R4).
-      ci-image: ghcr.io/paruff/ufawkes-ci@sha256:e85db8b3554da7c3362303d0e1e9681997d78093269b641e3535989f9c66f4da
+      # Built on fawkes-core 2.2.0 (uFawkesPipe@6905653), matching fawkes-space 2.2.0.
+      ci-image: ghcr.io/paruff/ufawkes-ci@sha256:575c812d55ca8f9c4faa5afb77dbb721969f8e866448fe7641e835be79057ee0
       pr-size-limit: 0
       skip-hooks: terraform_fmt,terraform_validate,terraform_tflint,terraform_docs
 
@@ -37,7 +38,7 @@ jobs:
   security:
     name: Security Scanning
     needs: [lint]
-    uses: paruff/ufawkespipe/.github/workflows/reusable-security-scanning.yml@main # main branch
+    uses: paruff/ufawkespipe/.github/workflows/reusable-security-scanning.yml@6dc21095aa8435b09e0503b3aa423ae501b91088 # main, Trivy 0.76.2 install
     with:
       scan-type: all
       severity-threshold: HIGH

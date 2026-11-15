@@ -479,6 +479,16 @@ DX-001
 | `score-service` stores and reads specs | `npm test` in `score-service/` | 4 passed, 1 skipped |
 | No uFawkesRes references remain in live docs | `grep -ri ufawkesres` over `docs/CONTRACTS.md`, `INTENT.md`, `backstage/catalog/` | None (history notes only) |
 
+Criteria 9 to 11 of the specification, added 2026-11-13. The tasks are the
+sub-issues of #153; none has been run.
+
+| Check | How | Tracked in |
+| --- | --- | --- |
+| 9: the templates pass uFawkesPipe's contract | A unit test renders each template and runs uFawkesPipe's generator at the named release; it fails for `language: node` | #149 |
+| 10: no Postgres, Jenkins or uFawkesSec outside history | `grep -rniE 'postgres:5432\|jenkins\|ufawkessec\|developerd\.git'` over tracked files returns only ADRs, the CHANGELOG and marked lines; `make test-unit` | #150 |
+| 11: the guard watches the pipeline | `main-ci-guard.yml` passes `workflow-id: ci-pipeline.yml`; uFawkes.dev's `make ci-determinism-audit` shows `ok` for this repo | #152 |
+| Versions and `docs/CONTRACTS.md` say what ships | Review against `CHANGELOG.md` and `score-service/server.js` | #151 |
+
 Setup the run depends on, found by the run itself:
 
 - `make up` runs `make backstage-bundle`, which builds the Backstage backend on the host (Node 22 or 24). The full install is too heavy to run inside a small Docker VM.
