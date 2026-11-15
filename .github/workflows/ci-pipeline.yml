@@ -37,7 +37,7 @@ jobs:
   security:
     name: Security Scanning
     needs: [lint]
-    uses: paruff/ufawkespipe/.github/workflows/reusable-security-scanning.yml@271154e53badbd96f3ef173f92ecb06545fc1cfb # v1.16.0-beta.1
+    uses: paruff/ufawkespipe/.github/workflows/reusable-security-scanning.yml@1949c5c608866348d5ff8030332df512d851b566 # main, Trivy 0.76.2 install
     with:
       scan-type: all
       severity-threshold: MEDIUM
