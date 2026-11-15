@@ -185,6 +185,11 @@ case "$EVENT" in
       '. + {message: $m, level: $level, status: $status, duration_ms: $duration} + $delivery' <<< "$base")"
     ;;
   deploy-marker)
+    # dora-api requires both; an event without them would be dropped with a 422 (AF-14).
+    if [ -z "$commit_sha" ] || [ -z "$pipeline_url" ]; then
+      warn "deploy-marker needs a commit SHA (GITHUB_SHA, CI_COMMIT_SHA or a git checkout) and a pipeline URL (GITHUB_RUN_ID or CI_PIPELINE_URL); no event emitted"
+      exit 1
+    fi
     delivery="$(delivery_json)"
     deploy_status="$status"
     [ "$status" = failure ] && deploy_status=failed
@@ -233,5 +238,15 @@ if [ -n "${OTEL_EXPORTER_OTLP_ENDPOINT:-}" ]; then
   done
   if ! curl -fsS --max-time 10 "${headers[@]}" -d "$otlp" "${OTEL_EXPORTER_OTLP_ENDPOINT%/}/v1/logs" > /dev/null; then
     warn "OTLP export to ${OTEL_EXPORTER_OTLP_ENDPOINT%/}/v1/logs failed; event kept on stdout${DORA_EVENTS_FILE:+ and in $DORA_EVENTS_FILE}"
+  fi
+fi
+
+# dora-api's POST /event is what turns a deployment into DORA metrics; the log
+# line above only reaches Loki (AF-15).
+if [ "$EVENT" = deploy-marker ] && [ -n "${DORA_INGESTION_URL:-}" ]; then
+  if ! jq -c .dora_event <<< "$line" | curl -fsS --max-time 10 -X POST \
+    -H "Content-Type: application/json" ${DORA_API_KEY:+-H "Authorization: Bearer ${DORA_API_KEY}"} \
+    --data-binary @- "${DORA_INGESTION_URL%/}/event" > /dev/null; then
+    warn "POST to ${DORA_INGESTION_URL%/}/event failed; the deployment is not counted in DORA metrics"
   fi
 fi
