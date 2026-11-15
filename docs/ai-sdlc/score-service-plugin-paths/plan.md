@@ -23,3 +23,7 @@ as `/plugins-evil` as inside `/plugins`.
 | Normal plugins still load              | Same test asserts the in-directory plugin is registered                                                         |
 | The SQLite store is unaffected         | The existing `SQLite store` test in `server.test.js` still passes                                               |
 | Commits and plan satisfy the CI gates  | Pre-flight (conventional-commit hook) and Artifact Chain pass on the PR                                         |
+
+### Audit follow-up, 2026-11-15
+
+This branch fixes High findings from the suite integration harness (uFawkes.dev `tests/suite-integration/AUDIT_FINDINGS.md`). Verified by running the harness against it: `make suite-integration-test` passes with the fix applied and the finding's reproduction test no longer reproduces.
