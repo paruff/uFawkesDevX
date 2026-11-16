@@ -19,7 +19,7 @@ function freshServerModule(env) {
   return require('./server.js');
 }
 
-test('triggerPipelineWebhook posts workload/action/metadata as JSON and does not throw on success', async () => {
+test('triggerPipelineWebhook sends a Woodpecker create-pipeline request and does not throw on success', async () => {
   const calls = [];
   const originalFetch = global.fetch;
   global.fetch = async (url, options) => {
@@ -29,18 +29,23 @@ test('triggerPipelineWebhook posts workload/action/metadata as JSON and does not
 
   try {
     const { triggerPipelineWebhook } = freshServerModule({
-      PIPELINE_WEBHOOK_URL: 'http://pipe.example/webhooks/trigger',
+      PIPELINE_WEBHOOK_URL: 'http://pipe.example/api/repos/7/pipelines',
+      PIPELINE_WEBHOOK_TOKEN: 'tok',
+      PIPELINE_BRANCH: 'release',
     });
 
     await triggerPipelineWebhook('my-workload', 'spec-updated', { version: 3 });
 
     assert.equal(calls.length, 1);
-    assert.equal(calls[0].url, 'http://pipe.example/webhooks/trigger');
+    assert.equal(calls[0].url, 'http://pipe.example/api/repos/7/pipelines');
     assert.equal(calls[0].options.method, 'POST');
+    assert.equal(calls[0].options.headers.Authorization, 'Bearer tok');
     const body = JSON.parse(calls[0].options.body);
-    assert.equal(body.workload, 'my-workload');
-    assert.equal(body.action, 'spec-updated');
-    assert.deepEqual(body.metadata, { version: 3 });
+    assert.equal(body.branch, 'release');
+    assert.equal(body.variables.SCORE_WORKLOAD, 'my-workload');
+    assert.equal(body.variables.SCORE_ACTION, 'spec-updated');
+    assert.deepEqual(JSON.parse(body.variables.SCORE_METADATA), { version: 3 });
+    assert.ok(Object.values(body.variables).every((v) => typeof v === 'string'));
   } finally {
     global.fetch = originalFetch;
   }

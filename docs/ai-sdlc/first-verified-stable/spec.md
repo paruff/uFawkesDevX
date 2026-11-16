@@ -26,7 +26,7 @@ These are uFawkesDevX's rows in the suite's [cross-repo interface contracts](htt
 | Release tags | Provides, to uFawkesDojo (White Belt labs pin a tag) | GitHub Releases |
 | Reusable workflows (`reusable-main-ci-guard`, `-preflight`, `-lint`, `-security-scanning`, `-dependency-review`, `-build`, `-tests`) | Consumes, from uFawkesPipe. This repo must not change their contracts | uFawkesPipe `README.md` |
 | `.fawkespipe.yml` pipeline contract, in the golden-path templates | Consumes, from uFawkesPipe | uFawkesPipe `docs/pipeline-contract.md` |
-| Pipeline trigger from the Score service (`PIPELINE_WEBHOOK_URL`) | Consumes, from uFawkesPipe | **Not defined** by uFawkesPipe (paruff/uFawkesPipe#217). The URL and payload are provisional, the variable is unset by default, and this release doesn't claim the trigger works |
+| Pipeline trigger from the Score service (`PIPELINE_WEBHOOK_URL`) | Consumes, from uFawkesPipe | uFawkesPipe's `docs/pipeline-trigger-contract.md` (a Woodpecker create-pipeline call). The variable is unset by default and the call hasn't been run against a live Woodpecker, so this release doesn't claim the trigger works end to end |
 | `ufawkes-ci` CI job image and `fawkes-space` devcontainer image | Consumes, from uFawkesPipe and uFawkesAI | Pinned by digest |
 
 ## Pipeline invariants

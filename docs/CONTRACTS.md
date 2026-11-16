@@ -39,7 +39,7 @@
 |---|---|
 | Direction | Score Service triggers pipelines in uFawkesPipe |
 | Transport | HTTPS POST to `PIPELINE_WEBHOOK_URL` (from `.env`) |
-| Payload | See `score-service/config/pipeline-payload.schema.json` |
+| Payload | A Woodpecker create-pipeline request (`branch`, string `variables`); see uFawkesPipe `docs/pipeline-trigger-contract.md` |
 | Owner | uFawkesPipe |
 | Breaking change | Webhook URL, auth scheme, or payload field rename |
 | Verification | `curl http://localhost:8081/api/v1/pipelines` shows a successful run after a spec trigger |
