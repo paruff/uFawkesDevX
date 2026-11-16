@@ -5,6 +5,34 @@ All notable changes to uFawkesDevX will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0](https://github.com/paruff/uFawkesDevX/compare/v1.2.0...v1.3.0) (2026-11-15)
+
+
+### Added
+
+* **make:** add test-quiet target ([#133](https://github.com/paruff/uFawkesDevX/issues/133)) ([#135](https://github.com/paruff/uFawkesDevX/issues/135)) ([9f6e080](https://github.com/paruff/uFawkesDevX/commit/9f6e080a31ba3ead5575773a23c0a7ef78115dfb))
+
+
+### Fixed
+
+* **ci:** deploy-marker fails without a commit SHA or pipeline URL (AF-14) ([#158](https://github.com/paruff/uFawkesDevX/issues/158)) ([cfd2432](https://github.com/paruff/uFawkesDevX/commit/cfd2432ad90ab2e5d805d5bf870972475b9c8d95))
+* **ci:** refresh workflow refs ([#155](https://github.com/paruff/uFawkesDevX/issues/155)) ([3ddb6f7](https://github.com/paruff/uFawkesDevX/commit/3ddb6f7bdde5fafaa4d2835db0ea651ecf5eb7d2))
+* **scripts:** emit-dora-event.sh posts deploy markers to dora-api (AF-15) ([#157](https://github.com/paruff/uFawkesDevX/issues/157)) ([b9ba41f](https://github.com/paruff/uFawkesDevX/commit/b9ba41fee2cee7460edcab8e16f33de5d6d60cbe))
+
+
+### Docs
+
+* add command-output rules to AGENTS.md ([#133](https://github.com/paruff/uFawkesDevX/issues/133)) ([4fdc969](https://github.com/paruff/uFawkesDevX/commit/4fdc969d63a5be8a0712905e2e66f02a9b02f108))
+* **design:** DESIGN.md, REVIEW.md and the Project 7 workflow ([#138](https://github.com/paruff/uFawkesDevX/issues/138)) ([c53f72c](https://github.com/paruff/uFawkesDevX/commit/c53f72c7e3655e40b2d17e456755457aebcc611b))
+* **docs:** interfaces, pipeline invariants and make commands ([#148](https://github.com/paruff/uFawkesDevX/issues/148)) ([1938c29](https://github.com/paruff/uFawkesDevX/commit/1938c2906442b6253421a617e900977ea324656d))
+* **docs:** specification adds three criteria from the suite audit ([#153](https://github.com/paruff/uFawkesDevX/issues/153)) ([#154](https://github.com/paruff/uFawkesDevX/issues/154)) ([9cb494e](https://github.com/paruff/uFawkesDevX/commit/9cb494e076d4cf3141df7b925840e8135133cf54))
+* retire docs/product (spec, discovery draft) ([#145](https://github.com/paruff/uFawkesDevX/issues/145)) ([05a9fcd](https://github.com/paruff/uFawkesDevX/commit/05a9fcd704d8ea8215f3be4be894843803a6ff63))
+
+
+### Chores
+
+* **devcontainer:** bump fawkes-space to 2.2.0 ([#156](https://github.com/paruff/uFawkesDevX/issues/156)) ([02ff187](https://github.com/paruff/uFawkesDevX/commit/02ff187643d105616a8c4007a60a5a39b2977a24))
+
 ## [1.2.0](https://github.com/paruff/uFawkesDevX/compare/v1.1.0...v1.2.0) (2026-10-17)
 
 
