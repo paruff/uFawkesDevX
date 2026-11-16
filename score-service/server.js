@@ -217,6 +217,10 @@ async function triggerPipelineWebhook(workload, action, metadata) {
     return;
   }
 
+  if (!pipelineAuth) {
+    console.warn('PIPELINE_WEBHOOK_TOKEN not set; Woodpecker will reject the pipeline trigger with 401');
+  }
+
   try {
     const response = await fetch(PIPELINE_WEBHOOK_URL, {
       method: 'POST',

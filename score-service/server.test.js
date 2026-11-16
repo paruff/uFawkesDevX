@@ -156,3 +156,31 @@ test('loadPlugins ignores symlinked plugins that resolve outside the plugins dir
   assert.ok(plugins.has('good'));
   assert.equal(plugins.has('outside'), false);
 });
+
+test('triggerPipelineWebhook warns and does not throw on a non-2xx answer, and sends no auth header without a token', async () => {
+  const calls = [];
+  const warnings = [];
+  const originalFetch = global.fetch;
+  const originalWarn = console.warn;
+  global.fetch = async (url, options) => {
+    calls.push({ url, options });
+    return { ok: false, status: 401 };
+  };
+  console.warn = (...args) => warnings.push(args.join(' '));
+
+  try {
+    const { triggerPipelineWebhook } = freshServerModule({
+      PIPELINE_WEBHOOK_URL: 'http://pipe.example/api/repos/7/pipelines',
+      PIPELINE_WEBHOOK_TOKEN: '',
+    });
+
+    await assert.doesNotReject(() => triggerPipelineWebhook('wl', 'spec-updated', {}));
+
+    assert.equal(calls[0].options.headers.Authorization, undefined);
+    assert.ok(warnings.some((w) => w.includes('PIPELINE_WEBHOOK_TOKEN not set')));
+    assert.ok(warnings.some((w) => w.includes('status 401')));
+  } finally {
+    global.fetch = originalFetch;
+    console.warn = originalWarn;
+  }
+});
