@@ -34,7 +34,7 @@ const PLUGINS_DIR = process.env.PLUGINS_DIR || '/app/plugins';
 // (docs/pipeline-trigger-contract.md there): a Woodpecker "create pipeline" call.
 // PIPELINE_WEBHOOK_URL is the full .../api/repos/{repo-id}/pipelines URL.
 const PIPELINE_WEBHOOK_URL = process.env.PIPELINE_WEBHOOK_URL || '';
-const PIPELINE_WEBHOOK_TOKEN = process.env.PIPELINE_WEBHOOK_TOKEN || '';
+const pipelineAuth = process.env.PIPELINE_WEBHOOK_TOKEN; // optional; unset sends no Authorization header
 const PIPELINE_BRANCH = process.env.PIPELINE_BRANCH || 'main';
 
 // Database: a SQLite file on a volume (single writer, file-copy backups).
@@ -222,7 +222,7 @@ async function triggerPipelineWebhook(workload, action, metadata) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(PIPELINE_WEBHOOK_TOKEN ? { Authorization: `Bearer ${PIPELINE_WEBHOOK_TOKEN}` } : {}),
+        ...(pipelineAuth ? { Authorization: `Bearer ${pipelineAuth}` } : {}),
       },
       // Woodpecker takes string variables only; the pipeline reads them as env vars.
       body: JSON.stringify({
