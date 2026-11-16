@@ -66,25 +66,28 @@ services:
 
 ## Pipeline webhook trigger
 
-> **TODO — unresolved upstream:** uFawkesPipe's `docs/webhook-api.md` documents
-> GitHub-originated push/PR webhooks (auto-registered per repo by Woodpecker
-> CI itself) and an authenticated, read-oriented REST API
-> (`GET /api/repos/{owner}/{repo}/pipelines`). It does **not** document an
-> endpoint for an external plane (like `score-service`) to trigger a brand-new
-> pipeline run for an arbitrary workload. Until that's confirmed, this is a
-> best-effort POST to whatever `PIPELINE_WEBHOOK_URL` you configure — treat
-> the payload shape below as provisional, not a stable contract.
+The trigger follows uFawkesPipe's
+[pipeline-trigger contract](https://github.com/paruff/uFawkesPipe/blob/main/docs/pipeline-trigger-contract.md):
+a Woodpecker "create pipeline" call. `PIPELINE_WEBHOOK_URL` is the full
+`.../api/repos/<repo-id>/pipelines` URL, `PIPELINE_WEBHOOK_TOKEN` a Woodpecker API
+token (sent as a bearer token) and `PIPELINE_BRANCH` the branch to run.
 
 Request sent by `triggerPipelineWebhook`:
 
 ```json
 {
-  "workload": "my-workload",
-  "action": "spec-updated",
-  "metadata": { "version": 3 },
-  "timestamp": "2026-08-14T12:00:00.000Z"
+  "branch": "main",
+  "variables": {
+    "SCORE_WORKLOAD": "my-workload",
+    "SCORE_ACTION": "spec-updated",
+    "SCORE_METADATA": "{\"version\":3}",
+    "SCORE_TIMESTAMP": "2026-08-14T12:00:00.000Z"
+  }
 }
 ```
+
+The call has not been run against a live Woodpecker server from this repo; the
+unit tests check the request shape.
 
 If `PIPELINE_WEBHOOK_URL` is unset, this step is skipped entirely (logged as
 a warning) and spec creation still succeeds.
@@ -94,5 +97,5 @@ a warning) and spec creation still succeeds.
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | `composeGenerated: false` in the API response | `score-compose` binary missing or spec invalid for generation | Check `score-service` container logs for the `score-compose generate failed for <name>` error |
-| `Pipeline webhook unreachable` warning in logs | `PIPELINE_WEBHOOK_URL` unset, unreachable, or endpoint doesn't exist yet upstream | Expected until uFawkesPipe's trigger endpoint is confirmed — spec creation is unaffected |
+| `Pipeline webhook unreachable` warning in logs | `PIPELINE_WEBHOOK_URL` unset, unreachable, or the token or repo id is wrong (Woodpecker answers 401/404 and a `Pipeline webhook responded with status` warning is logged) | Check the URL and token against the pipeline-trigger contract — spec creation is unaffected |
 | `score-compose: command not found` at build time | Dockerfile's `TARGETARCH` build arg didn't resolve | Ensure you're building with BuildKit enabled (default in recent Docker) |

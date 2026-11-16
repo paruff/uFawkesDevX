@@ -30,12 +30,12 @@ const API_PORT = process.env.API_PORT || 8081;
 const WEBHOOK_PORT = process.env.WEBHOOK_PORT || 8082;
 const SPECS_DIR = process.env.SPECS_DIR || '/app/specs';
 const PLUGINS_DIR = process.env.PLUGINS_DIR || '/app/plugins';
-// TODO: uFawkesPipe's docs/webhook-api.md does not document an endpoint for
-// external planes to trigger a new pipeline run (only GitHub-originated
-// webhooks and an authenticated read-oriented REST API are documented).
-// PIPELINE_WEBHOOK_URL and this payload shape are provisional until that's
-// confirmed upstream.
+// The pipeline trigger is uFawkesPipe's pipeline-trigger contract
+// (docs/pipeline-trigger-contract.md there): a Woodpecker "create pipeline" call.
+// PIPELINE_WEBHOOK_URL is the full .../api/repos/{repo-id}/pipelines URL.
 const PIPELINE_WEBHOOK_URL = process.env.PIPELINE_WEBHOOK_URL || '';
+const pipelineAuth = process.env.PIPELINE_WEBHOOK_TOKEN; // optional; unset sends no Authorization header
+const PIPELINE_BRANCH = process.env.PIPELINE_BRANCH || 'main';
 
 // Database: a SQLite file on a volume (single writer, file-copy backups).
 // Opened in initDatabase() so requiring this module has no side effects.
@@ -217,11 +217,27 @@ async function triggerPipelineWebhook(workload, action, metadata) {
     return;
   }
 
+  if (!pipelineAuth) {
+    console.warn('PIPELINE_WEBHOOK_TOKEN not set; Woodpecker will reject the pipeline trigger with 401');
+  }
+
   try {
     const response = await fetch(PIPELINE_WEBHOOK_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ workload, action, metadata, timestamp: new Date().toISOString() }),
+      headers: {
+        'Content-Type': 'application/json',
+        ...(pipelineAuth ? { Authorization: `Bearer ${pipelineAuth}` } : {}),
+      },
+      // Woodpecker takes string variables only; the pipeline reads them as env vars.
+      body: JSON.stringify({
+        branch: PIPELINE_BRANCH,
+        variables: {
+          SCORE_WORKLOAD: String(workload),
+          SCORE_ACTION: String(action),
+          SCORE_METADATA: JSON.stringify(metadata ?? {}),
+          SCORE_TIMESTAMP: new Date().toISOString(),
+        },
+      }),
     });
     if (!response.ok) {
       console.warn(`Pipeline webhook responded with status ${response.status}`);
