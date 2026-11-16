@@ -20,7 +20,7 @@ jobs:
   # ─── Stage 0: Pre-flight ──────────────────────────────────────────────────
   preflight:
     name: Pre-flight
-    uses: paruff/ufawkespipe/.github/workflows/reusable-preflight.yml@main # main branch
+    uses: paruff/ufawkespipe/.github/workflows/reusable-preflight.yml@271154e53badbd96f3ef173f92ecb06545fc1cfb # v1.16.0-beta.1
     with:
       # CI's hook stages run in the suite's CI image (ci-pipeline spec R4).
       # Built on fawkes-core 2.2.0 (uFawkesPipe@6905653), matching fawkes-space 2.2.0.
@@ -32,7 +32,7 @@ jobs:
   lint:
     name: Static Analysis
     needs: [preflight]
-    uses: paruff/ufawkespipe/.github/workflows/reusable-lint.yml@main # main branch
+    uses: paruff/ufawkespipe/.github/workflows/reusable-lint.yml@271154e53badbd96f3ef173f92ecb06545fc1cfb # v1.16.0-beta.1
 
   # ─── Stage 2: Security Scanning ─────────────────────────────────────────
   security:
@@ -72,7 +72,7 @@ jobs:
   dependency-review:
     name: Dependency Review
     needs: [lint]
-    uses: paruff/ufawkespipe/.github/workflows/reusable-dependency-review.yml@main # main branch
+    uses: paruff/ufawkespipe/.github/workflows/reusable-dependency-review.yml@271154e53badbd96f3ef173f92ecb06545fc1cfb # v1.16.0-beta.1
     with:
       fail-on-severity: high
       comment-summary-in-pr: "true"
@@ -81,7 +81,7 @@ jobs:
   build:
     name: Build & Validate
     needs: [security, dependency-review]
-    uses: paruff/ufawkespipe/.github/workflows/reusable-build.yml@main # main branch
+    uses: paruff/ufawkespipe/.github/workflows/reusable-build.yml@271154e53badbd96f3ef173f92ecb06545fc1cfb # v1.16.0-beta.1
     with:
       fail-on-latest: false
       enable-coverage-gate: false
@@ -90,7 +90,7 @@ jobs:
   tests:
     name: Tests
     needs: [build]
-    uses: paruff/ufawkespipe/.github/workflows/reusable-tests.yml@main # main branch
+    uses: paruff/ufawkespipe/.github/workflows/reusable-tests.yml@271154e53badbd96f3ef173f92ecb06545fc1cfb # v1.16.0-beta.1
     with:
       test-tiers: "unit"
       python-version: "3.11"
