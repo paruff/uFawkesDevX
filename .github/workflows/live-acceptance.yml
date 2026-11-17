@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
-      - name: DORA job start
+      - name: job-start
         run: echo "job-start:$(date -u +%Y-%m-%dT%H:%M:%SZ) workflow:${{ github.workflow }} sha:${{ github.sha }}"
 
       - name: Checkout code
@@ -63,7 +63,7 @@ jobs:
         if: always()
         run: docker compose down -v
 
-      - name: DORA job finish
+      - name: job-finish
         if: always()
         run: |
           echo "job-finish:$(date -u +%Y-%m-%dT%H:%M:%SZ)"
